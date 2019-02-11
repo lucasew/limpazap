@@ -10,5 +10,5 @@ A operação é bem simples: O usuário pode escolher um dos arquivos individual
 
 
 # TODO
-[ ] Logo
-[ ] Mandar para a PlayStore
+- [ ] Logo
+- [ ] Mandar para a PlayStore
