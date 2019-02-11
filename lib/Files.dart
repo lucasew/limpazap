@@ -18,6 +18,7 @@ class FilesModel extends Model {
       .where((f) =>
           RegExp(r"msgstore-").hasMatch(f.path)) // Só deixa os backups antigos
       .toList(); // Tira preguiça
+
   deleteFile(File f) {
     print("Deletado: ${f.path}");
     if (f.existsSync()) {
@@ -35,8 +36,8 @@ class FilesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
     return ScopedModelDescendant<FilesModel>(
-        builder: (context, child, model) => Column(
-            children: model.files
+        builder: (contextFile, childFile, modelFile) => Column(
+            children: modelFile.files
                 .map((f) => DeletableFile(f)) // Transforma no widget
                 .toList())); // Transforma em lista
   }

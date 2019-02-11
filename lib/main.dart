@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import './Files.dart';
 import './CleanAllFloatingButton.dart';
+import './Permissions.dart';
 
 void main() {
   runApp(ScopedModel<FilesModel>(model: FilesModel(), child: MyApp()));
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
             appBar: AppBar(title: Text("Limpador de WhatsApp")),
             body: Container(
                 alignment: Alignment.bottomCenter,
-                child: Material(child: FilesWidget())),
+                child: Material(child: DataHolder())),
             floatingActionButton: CleanAllFloatingButton()));
   }
 }
