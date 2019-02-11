@@ -1,5 +1,5 @@
-name: whatsapp_cleaner_flutter
-description: A new Flutter project.
+name: whatsapp_cleaner
+description: "Limpa backups antigos do WhatsApp que só servem para ocupar espaço."
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
