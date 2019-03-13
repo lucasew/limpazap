@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:path/path.dart' as path;
-import './Files.dart';
+import 'package:scoped_model/scoped_model.dart';
+import './FilesModel.dart';
 
-class DeletableFile extends StatelessWidget {
-  DeletableFile(this.file);
+class DeletableFileWidget extends StatelessWidget {
   final File file;
+  DeletableFileWidget(this.file);
 
   String labelFileSize(File file) {
     var size = file.lengthSync();
@@ -34,10 +34,12 @@ class DeletableFile extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.clear),
               onPressed: () {
-                var snackbar = SnackBar(content: Text("Deletado $file"));
-                ScopedModel.of<FilesModel>(ctx, rebuildOnChange: true)
-                    .deleteFile(this.file);
-                Scaffold.of(ctx)
+                var snackbar = SnackBar(
+                    content: Text("Deletado $file")); // Generate the snackbar
+                this.file.deleteSync(); // Delete the file
+                ScopedModel.of<FilesModel>(ctx)
+                    .notifyDelete(); // Notify about the delete
+                Scaffold.of(ctx) // Show snackbar
                   ..removeCurrentSnackBar()
                   ..showSnackBar(snackbar);
               })
