@@ -9,16 +9,20 @@ import './FilesModel.dart';
 class DataHolderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
+    Widget ret;
     return ScopedModelDescendant<PermissionModel>(
-        builder: (context, child, model) {
-      if (model.readExternalStoragePermission) {
-        if (ScopedModel.of<FilesModel>(ctx).deletableFiles.length == 0) {
-          return NothingHereWidget();
+        builder: (context, child, pmodel) {
+      return ScopedModelDescendant<FilesModel>(
+          builder: (context, child, fmodel) {
+        if (pmodel.readExternalStoragePermission) {
+          if (fmodel.deletableFiles.length == 0) {
+            return NothingHereWidget();
+          }
+          return FilesWidget();
+        } else {
+          return ForbiddenStorageWidget();
         }
-        return FilesWidget();
-      } else {
-        return ForbiddenStorageWidget();
-      }
+      });
     });
   }
 }
