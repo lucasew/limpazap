@@ -9,7 +9,7 @@ import './FilesModel.dart';
 class DataHolderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
-    Widget ret;
+    // Inner functions return to outer ones
     return ScopedModelDescendant<PermissionModel>(
         builder: (context, child, pmodel) {
       return ScopedModelDescendant<FilesModel>(
