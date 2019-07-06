@@ -24,23 +24,15 @@ class ArquivoWidget extends StatelessWidget {
       ]),
       FlatButton(
           child: Icon(Icons.delete),
-          onPressed: () => chan.add(this.arquivo)) // FlatButton
+          onPressed: () {
+            chan.add(this.arquivo);
+            Scaffold.of(ctx).showSnackBar(SnackBar(
+                    content: Text("Apagado $texto liberando $tamanho!") // Text
+                    ) // SnackBar
+                ); // showSnackBar
+            Future.delayed(Duration(seconds: 3))
+                .then((_) => Scaffold.of(ctx).hideCurrentSnackBar);
+          }) // FlatButton
     ]);
-
-    return Card(
-        semanticContainer: true,
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          Icon(Icons.calendar_today),
-          Text(texto, style: TextStyle(fontSize: 36)), // Text
-          Align(
-              alignment: Alignment.centerRight,
-              child: FlatButton(
-                  child: Icon(Icons.delete),
-                  onPressed: () => chan.add(this.arquivo)) // FlatButton
-              ) //Align
-        ] // Widget[]
-                ) // Row
-        ); // Card
   }
 }

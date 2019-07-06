@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import './ArquivoWidget.dart';
 import '../model/ArquivoDeletavelModel.dart';
 import '../controller/ArquivoDeletavelController.dart';
+import './ArquivosWidget.dart';
+import './SemArquivosWidget.dart';
 
 class ArquivosView extends StatefulWidget {
   createState() => ArquivosViewState();
@@ -11,18 +13,19 @@ class ArquivosView extends StatefulWidget {
 class ArquivosViewState extends State<ArquivosView> {
   final chan = new StreamController<
       ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
-  List<ArquivoWidget> arquivos = [];
+  List<ArquivoDeletavel> arquivos = [];
 
   ArquivosViewState() {
     listen();
+    this.arquivos = update_arquivos();
+  }
+
+  List<ArquivoDeletavel> update_arquivos() {
+    return ArquivoDeletavelController().arquivos;
   }
 
   update() async {
-    var arq = ArquivoDeletavelController()
-        .arquivos
-        .map((a) => ArquivoWidget(a, chan))
-        .toList();
-    this.setState(() => this.arquivos = arq);
+    this.setState(() => this.arquivos = update_arquivos());
   }
 
   listen() async {
@@ -41,12 +44,13 @@ class ArquivosViewState extends State<ArquivosView> {
               FlatButton(
                   child: Icon(Icons.refresh), onPressed: update) // FlatButton
             ]), // AppBar
-        body: ListView(children: this.arquivos), // ListView
         floatingActionButton: FloatingActionButton(
+            tooltip: "Apagar tudo!",
             child: Icon(Icons.delete),
-            onPressed: () =>
-                arquivos.forEach((arq) => chan.add(arq.arquivo)) // forEach
-            ) // FloatingActionButton
+            onPressed: () => arquivos.forEach((arq) => chan.add(arq))),
+        body: this.arquivos.length == 0
+            ? SemArquivosWidget()
+            : ArquivosWidget(this.arquivos, chan) // ArquivosWidget
         ); // Scaffold
   }
 }
