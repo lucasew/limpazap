@@ -1,4 +1,4 @@
-package com.example.whatsappcleanerflutter;
+package com.lucao.limpazap;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
