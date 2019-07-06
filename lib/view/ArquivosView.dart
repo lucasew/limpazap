@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import './ArquivoWidget.dart';
 import '../model/ArquivoDeletavelModel.dart';
 import '../controller/ArquivoDeletavelController.dart';
 import './ArquivosWidget.dart';
