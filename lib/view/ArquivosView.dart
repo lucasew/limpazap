@@ -14,6 +14,7 @@ class ArquivosViewState extends State<ArquivosView> {
   final chan = new StreamController<
       ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
   List<ArquivoDeletavel> arquivos = [];
+  bool inverter = false;
 
   ArquivosViewState() {
     listen();
@@ -21,7 +22,10 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   List<ArquivoDeletavel> update_arquivos() {
-    return ArquivoDeletavelController().arquivos;
+    var arquivos = ArquivoDeletavelController().arquivos;
+    arquivos.sort((x, y) => x.data_criacao.compareTo(y.data_criacao));
+    if (this.inverter) arquivos = arquivos.reversed.toList();
+    return arquivos;
   }
 
   update() async {
@@ -41,10 +45,22 @@ class ArquivosViewState extends State<ArquivosView> {
             title: Text("Limpador de WhatsApp"),
             backgroundColor: Colors.green,
             actions: <Widget>[
-              FlatButton(
-                  child: Icon(Icons.refresh), onPressed: update) // FlatButton
+              IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: update,
+                  tooltip: "Atualizar lista"), // IconButton
+              IconButton(
+                  icon: Icon(this.inverter
+                      ? Icons.fast_rewind
+                      : Icons.fast_forward), // Icon
+                  tooltip: "Inverter/Desinverter ordem",
+                  onPressed: () {
+                    this.inverter = !this.inverter;
+                    update();
+                  }) // IconButton
             ]), // AppBar
         floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.green,
             tooltip: "Apagar tudo!",
             child: Icon(Icons.delete),
             onPressed: () => arquivos.forEach((arq) => chan.add(arq))),

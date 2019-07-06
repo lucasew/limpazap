@@ -4,10 +4,11 @@ import 'view/ArquivosView.dart';
 import 'dart:io';
 
 void main() async {
-  checar_permissao()
-      .then((_) => runApp(MaterialApp(home: ArquivosView()) // MaterialApp
+  checar_permissao().then((_) => runApp(MaterialApp(
+            home: ArquivosView(),
+          ) // MaterialApp
               ) // runApp
-          ); // then
+      ); // then
 }
 
 Future<void> checar_permissao() async {

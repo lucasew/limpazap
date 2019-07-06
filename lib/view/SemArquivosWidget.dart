@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../controller/SnackbarController.dart';
 
 class SemArquivosWidget extends StatelessWidget {
   mostrarInfo(BuildContext ctx) async {
     await Future.delayed(Duration(milliseconds: 500));
-    Scaffold.of(ctx).showSnackBar(
-        SnackBar(content: Text("Nenhum arquivo foi encontrado!")));
-    Future.delayed(Duration(seconds: 3), Scaffold.of(ctx).hideCurrentSnackBar);
+    SnackbarController(
+            ctx, SnackBar(content: Text("Nenhum arquivo foi encontrado!")))
+        .show();
   }
 
   Widget build(BuildContext ctx) {

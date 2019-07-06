@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
+import '../controller/SnackbarController.dart';
 import 'dart:async';
 
 class ArquivoWidget extends StatelessWidget {
@@ -9,30 +10,33 @@ class ArquivoWidget extends StatelessWidget {
 
   Widget build(BuildContext ctx) {
     var d = arquivo.data_criacao;
-    var texto = "${d.day}/${d.month}/${d.year}";
+    var texto =
+        "${d.day}/${d.month}/${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
-    return ButtonBar(children: <Widget>[
-      Column(children: <Widget>[
-        Row(children: <Widget>[
-          Icon(Icons.calendar_today), // Icon
-          Text(texto, style: TextStyle(fontSize: 36)) // Text
-        ]), // Row
-        Row(children: <Widget>[
-          Icon(Icons.format_size),
-          Text(tamanho, style: TextStyle(fontSize: 36))
-        ]) // Row
-      ]),
-      FlatButton(
-          child: Icon(Icons.delete),
-          onPressed: () {
-            chan.add(this.arquivo);
-            Scaffold.of(ctx).showSnackBar(SnackBar(
-                    content: Text("Apagado $texto liberando $tamanho!") // Text
-                    ) // SnackBar
-                ); // showSnackBar
-            Future.delayed(Duration(seconds: 3))
-                .then((_) => Scaffold.of(ctx).hideCurrentSnackBar);
-          }) // FlatButton
-    ]);
+    var elemento = ListTile(
+        title: Text(texto, style: TextStyle(fontSize: 36) // TextStyle
+            ), // Text
+        subtitle: Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
+            ) // Text
+        ); // ListTile
+    return Center(
+        child: Dismissible(
+            key: Key(this.arquivo.arquivo.path),
+            child: Center(child: elemento),
+            background: Container(color: Colors.red, child: Icon(Icons.delete)),
+            onDismissed: (_) {
+              chan.add(this.arquivo);
+              SnackbarController(
+                      ctx,
+                      SnackBar(
+                          content:
+                              Text("Apagado $texto liberando $tamanho!") // Text
+                          ) // SnackBar
+                      )
+                  .show();
+              Future.delayed(Duration(seconds: 3))
+                  .then((_) => Scaffold.of(ctx).hideCurrentSnackBar);
+            }) // Dismissible
+        );
   }
 }
