@@ -18,10 +18,10 @@ class ArquivosViewState extends State<ArquivosView> {
 
   ArquivosViewState() {
     listen();
-    this.arquivos = update_arquivos();
+    this.arquivos = updateArquivos();
   }
 
-  List<ArquivoDeletavel> update_arquivos() {
+  List<ArquivoDeletavel> updateArquivos() {
     var arquivos = ArquivoDeletavelController().arquivos;
     arquivos.sort((x, y) => x.data_criacao.compareTo(y.data_criacao));
     if (this.inverter) arquivos = arquivos.reversed.toList();
@@ -29,7 +29,7 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   update() async {
-    this.setState(() => this.arquivos = update_arquivos());
+    this.setState(() => this.arquivos = updateArquivos());
   }
 
   listen() async {

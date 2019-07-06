@@ -9,13 +9,6 @@ class ArquivosWidget extends StatelessWidget {
   StreamController<ArquivoDeletavel> chan;
   ArquivosWidget(this.arquivos, this.chan);
   Widget build(BuildContext ctx) {
-    SnackbarController(
-            ctx,
-            SnackBar(
-                content:
-                    Text("${arquivos.length} arquivos encontrados!") // Text
-                ))
-        .show(); // SnackBar
     return ListView(
         children: this
             .arquivos
