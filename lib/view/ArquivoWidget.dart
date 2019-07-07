@@ -9,13 +9,16 @@ class ArquivoWidget extends StatelessWidget {
   ArquivoWidget(this.arquivo, this.chan);
 
   Widget build(BuildContext ctx) {
-    var d = arquivo.data_criacao;
+    var d = arquivo.dataCriacao;
     var texto =
         "${d.day}/${d.month}/${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
-        title: Text(texto, style: TextStyle(fontSize: 36) // TextStyle
-            ), // Text
+        title: Row(children: <Widget>[
+          Icon(arquivo.isUltimo ? Icons.warning : Icons.backup),
+          Text(texto, style: TextStyle(fontSize: 36) // TextStyle
+              ), // Text
+        ]), // Row
         subtitle: Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
             ) // Text
         ); // ListTile
@@ -24,6 +27,17 @@ class ArquivoWidget extends StatelessWidget {
             key: Key(this.arquivo.arquivo.path),
             child: Center(child: elemento),
             background: Container(color: Colors.red, child: Icon(Icons.delete)),
+            confirmDismiss: ((_) async {
+              var sc = SnackbarController(
+                  ctx,
+                  SnackBar(
+                      content: Text(
+                          "Não é possível apagar este arquivo manualmente.\n" +
+                              "Toque em limpar tudo para apagar todos os backups!")) // SnackBar
+                  ); // SnackBarController
+              if (this.arquivo.isUltimo) sc.show();
+              return !this.arquivo.isUltimo;
+            }),
             onDismissed: (_) {
               chan.add(this.arquivo);
               SnackbarController(
@@ -34,8 +48,6 @@ class ArquivoWidget extends StatelessWidget {
                           ) // SnackBar
                       )
                   .show();
-              Future.delayed(Duration(seconds: 3))
-                  .then((_) => Scaffold.of(ctx).hideCurrentSnackBar);
             }) // Dismissible
         );
   }

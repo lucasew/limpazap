@@ -14,6 +14,7 @@ class ArquivosViewState extends State<ArquivosView> {
       ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
   List<ArquivoDeletavel> arquivos = [];
   bool inverter = false;
+  bool exibirUltimo = false;
 
   ArquivosViewState() {
     listen();
@@ -21,10 +22,9 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   List<ArquivoDeletavel> updateArquivos() {
-    var arquivos = ArquivoDeletavelController().arquivos;
-    arquivos.sort((x, y) => x.data_criacao.compareTo(y.data_criacao));
-    if (this.inverter) arquivos = arquivos.reversed.toList();
-    return arquivos;
+    return ArquivoDeletavelController(
+            inverter: this.inverter, exibirUltimo: this.exibirUltimo)
+        .arquivos;
   }
 
   update() async {
@@ -33,7 +33,7 @@ class ArquivosViewState extends State<ArquivosView> {
 
   listen() async {
     chan.stream.listen((ad) {
-      ad.apagar();
+      ad.arquivo.deleteSync();
       update();
     });
   }
@@ -41,7 +41,7 @@ class ArquivosViewState extends State<ArquivosView> {
   Widget build(BuildContext ctx) {
     return Scaffold(
         appBar: AppBar(
-            title: Text("Limpador de WhatsApp"),
+            title: Text("Limpador de WhatsApp", overflow: TextOverflow.visible),
             backgroundColor: Colors.green,
             actions: <Widget>[
               IconButton(
@@ -50,13 +50,23 @@ class ArquivosViewState extends State<ArquivosView> {
                   tooltip: "Atualizar lista"), // IconButton
               IconButton(
                   icon: Icon(this.inverter
-                      ? Icons.fast_rewind
-                      : Icons.fast_forward), // Icon
+                      ? Icons.fast_forward
+                      : Icons.fast_rewind), // Icon
                   tooltip: "Inverter/Desinverter ordem",
                   onPressed: () {
                     this.inverter = !this.inverter;
                     update();
-                  }) // IconButton
+                  }), // IconButton
+              IconButton(
+                  icon: Icon(this.exibirUltimo
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  tooltip:
+                      "Exibir o ultimo backup feito (não é recomendável apaga-lo!)",
+                  onPressed: () {
+                    this.exibirUltimo = !this.exibirUltimo;
+                    update();
+                  })
             ]), // AppBar
         floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.green,

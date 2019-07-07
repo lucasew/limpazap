@@ -2,12 +2,11 @@ import 'dart:io';
 
 class ArquivoDeletavel {
   final File arquivo;
-  DateTime data_criacao;
+  DateTime dataCriacao;
   int tamanho;
-  ArquivoDeletavel(this.arquivo) {
-    this.data_criacao = this.arquivo.lastModifiedSync();
+  bool isUltimo;
+  ArquivoDeletavel(this.arquivo, {this.isUltimo: false}) {
+    this.dataCriacao = this.arquivo.lastModifiedSync();
     this.tamanho = this.arquivo.lengthSync();
   }
-
-  apagar() async => (await this.arquivo.delete()).exists();
 }

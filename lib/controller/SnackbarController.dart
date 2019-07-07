@@ -4,12 +4,12 @@ import 'dart:async';
 class SnackbarController {
   SnackBar snack;
   ScaffoldState scaffold;
-  SnackbarController(BuildContext ctx, this.snack) {
+  SnackbarController(ctx, this.snack) {
     scaffold = Scaffold.of(ctx);
   }
 
-  show() async {
-    await Future.delayed(Duration(milliseconds: 500));
+  show({afterMs: 0}) async {
+    await Future.delayed(Duration(milliseconds: afterMs));
     scaffold.removeCurrentSnackBar();
     scaffold.showSnackBar(snack);
   }
