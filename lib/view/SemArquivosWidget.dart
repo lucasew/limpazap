@@ -3,7 +3,6 @@ import '../controller/SnackbarController.dart';
 
 class SemArquivosWidget extends StatelessWidget {
   mostrarInfo(BuildContext ctx) async {
-    await Future.delayed(Duration(milliseconds: 500));
     SnackbarController(
             ctx, SnackBar(content: Text("Nenhum arquivo foi encontrado!")))
         .show();
