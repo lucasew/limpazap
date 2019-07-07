@@ -15,12 +15,15 @@ class ArquivoWidget extends StatelessWidget {
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
         title: Row(children: <Widget>[
-          Icon(arquivo.isUltimo ? Icons.warning : Icons.backup),
+          Icon(arquivo.isUltimo ? Icons.warning : Icons.history),
           Text(texto, style: TextStyle(fontSize: 36) // TextStyle
               ), // Text
         ]), // Row
-        subtitle: Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
-            ) // Text
+        subtitle: Row(children: <Widget>[
+          Icon(Icons.sd_card),
+          Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
+              ) // Text
+        ]) // Row
         ); // ListTile
     return Center(
         child: Dismissible(
