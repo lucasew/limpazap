@@ -4,9 +4,7 @@ Para quem não sabe, o WhatsApp necessita fazer backup das conversas por que nã
 
 As letras grandes foram um feedback recebido por potenciais usuários que já não tem uma visão tão boa.
 
-A operação é bem simples: O usuário pode escolher um dos arquivos individualmente e clicar no X para apagar, ou, apertar o botãozinho e apagar tudo de uma vez.
-
-![Demonstração do APP](demo.png)
+![Demonstração do APP](https://imgur.com/XqoLQwz)
 
 
 # TODO
