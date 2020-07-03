@@ -33,3 +33,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
         tag: commit-${{ github.sha }}
+        draft: true
+        prerelease: true
