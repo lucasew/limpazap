@@ -1,0 +1,37 @@
+# This is a basic workflow to help you get started with Actions
+
+name: release
+on: push
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+      
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+
+    - uses: subosito/flutter-action@v1
+      with:
+        flutter-version: '1.7.8+hotfix.4'
+    - run: flutter pub get
+#    - run: flutter test
+    - run: flutter build apk --release
+      
+    - name: Create a Release APK
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/app/outputs/apk/*/*.apk"
+        name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit: ${{ steps.extract_branch.outputs.branch }}
+        tag: commit-${{ github.sha }}
+        draft: true
+        prerelease: true
