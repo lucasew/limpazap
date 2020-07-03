@@ -1,7 +1,9 @@
 # This is a basic workflow to help you get started with Actions
 
 name: release
-on: push
+on: 
+  push:
+    tags: '*'
 jobs:
   build:
     name: Build APK
@@ -22,4 +24,5 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/app/outputs/apk/debug/app-release.apk"
+        name: Compilação automática ${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
