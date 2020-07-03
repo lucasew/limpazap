@@ -17,9 +17,9 @@ jobs:
     - run: flutter pub get
 #    - run: flutter test
     - run: flutter build apk --release
+      
     - name: Create a Release APK
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/app/outputs/apk/debug/app-release.apk"
-        name: limpazap.apk
         token: ${{ secrets.GITHUB_TOKEN }}
