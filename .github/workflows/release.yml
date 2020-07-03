@@ -32,4 +32,4 @@ jobs:
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
-        tag: ${{ github.sha }}
+        tag: commit-${{ github.sha }}
