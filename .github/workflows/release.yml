@@ -28,7 +28,7 @@ jobs:
     - name: Create a Release APK
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/app/outputs/apk/debug/app-release.apk"
+        artifacts: "build/app/outputs/apk/*/*.apk"
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
