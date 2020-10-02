@@ -22,6 +22,7 @@ jobs:
       with:
         flutter-version: '1.7.8+hotfix.4'
     - run: flutter pub get
+    - run: flutter pub run flutter_launcher_icons:main
 #    - run: flutter test
     - run: flutter build apk --release
       
