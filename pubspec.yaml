@@ -28,13 +28,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.8.0"
+  flutter_launcher_icons: "^0.7.5"
 
 flutter_icons:
-  image_path: "media/icone-verde.png"
-  adaptative_icon_foreground: "media/icone-verde.png"
+  image_path_android: "media/icone-verde.png"
   android: true
-  ios: false
 
 
 # For information on the generic Dart part of this file, see the
