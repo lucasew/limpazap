@@ -10,5 +10,4 @@ As letras grandes foram um feedback recebido por potenciais usuários que já n�
 
 
 # TODO
-- [ ] Logo
 - [ ] Mandar para a PlayStore
