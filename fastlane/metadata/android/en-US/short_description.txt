@@ -1,1 +1,2 @@
- Limpa backups antigos do WhatsApp
+Clean old WhatsApp backups
+
