@@ -30,12 +30,17 @@ let
   ANDROID_HOME = "${sdk}/libexec/android-sdk";
 in
 pkgs.mkShell {
-  shellHook = ''echo ${sdk}'';
+  shellHook = ''
+    echo ${sdk}
+    flutter packages get
+    flutter packages run flutter_launcher_icons:main
+  '';
   buildInputs = with pkgs; [
     sdk
     glibc
     flutter
     jre
+    dart
   ];
   # override the aapt2 that gradle uses with the nix-shipped version
   GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
