@@ -1,4 +1,10 @@
-{ pkgs ? import <nixpkgs> {
+let
+  nixpkgs = builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/257cbbcd3ab7bd96f5d24d50adc807de7c82e06d.tar.gz";
+    sha256 = "sha256-hCsGe2nDz+SX4uO+lj0qPVcSGZdt52R9Yk5MOYs4djw=";
+  };
+in
+{ pkgs ? import nixpkgs {
   config.android_sdk.accept_license = true;
 }}:
 
