@@ -4,18 +4,21 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 void main() async {
-  checar_permissao().then((_) => runApp(
+  await WidgetsFlutterBinding.ensureInitialized();
+  await checar_permissao();
+  runApp(
     MaterialApp(home: ArquivosView())
-  ));
+  );
 }
 
 Future<void> checar_permissao() async {
-    if (await Permission.storage.isPermanentlyDenied) {
-        openAppSettings();
+    while (true) {
+        if (await Permission.storage.status.isGranted) {
+            return;
+        } else if (await Permission.storage.isPermanentlyDenied) {
+            await openAppSettings();
+        } else {
+            print(await Permission.storage.request());
+        }
     }
-    if (await Permission.storage.status.isGranted) {
-        return;
-    }
-    var newState = Permission.storage.request();
-    print(newState);
 }
