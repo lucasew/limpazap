@@ -11,7 +11,7 @@ class ArquivoWidget extends StatelessWidget {
   Widget build(BuildContext ctx) {
     var d = arquivo.dataCriacao;
     var texto =
-        "${d.day}/${d.month}/${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
+        "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
         title: Row(children: <Widget>[
