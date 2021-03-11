@@ -41,27 +41,8 @@ class ArquivoWidget extends StatelessWidget {
                 child: Icon(Icons.delete,size: 36),
                 padding: EdgeInsets.symmetric(horizontal: 30)
             ),
-            confirmDismiss: ((_) async {
-              var sc = SnackbarController(
-                  ctx,
-                  SnackBar(
-                      content: Text(
-                          "Não é possível apagar este arquivo manualmente.\n" +
-                              "Toque em limpar tudo para apagar todos os backups!")) // SnackBar
-                  ); // SnackBarController
-              if (this.arquivo.isUltimo) sc.show();
-              return !this.arquivo.isUltimo;
-            }),
             onDismissed: (_) {
               chan.add(this.arquivo);
-              SnackbarController(
-                      ctx,
-                      SnackBar(
-                          content:
-                              Text("Apagado $texto liberando $tamanho!") // Text
-                          ) // SnackBar
-                      )
-                  .show();
             }) // Dismissible
         );
   }

@@ -10,8 +10,7 @@ class ArquivosView extends StatefulWidget {
 }
 
 class ArquivosViewState extends State<ArquivosView> {
-  final chan = new StreamController<
-      ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
+  final chan = new StreamController<ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
   List<ArquivoDeletavel> arquivos = [];
   bool inverter = false;
   bool exibirUltimo = false;
@@ -47,13 +46,12 @@ class ArquivosViewState extends State<ArquivosView> {
             actions: <Widget>[
               IconButton(
                   icon: Icon(Icons.refresh),
-                  onPressed: update,
-                  tooltip: "Atualizar lista"), // IconButton
+                  onPressed: update
+              ),
               IconButton(
                   icon: Icon(this.inverter
                       ? Icons.fast_forward
                       : Icons.fast_rewind), // Icon
-                  tooltip: "Inverter/Desinverter ordem",
                   onPressed: () {
                     this.inverter = !this.inverter;
                     update();
@@ -62,8 +60,6 @@ class ArquivosViewState extends State<ArquivosView> {
                   icon: Icon(this.exibirUltimo
                       ? Icons.visibility_off
                       : Icons.visibility),
-                  tooltip:
-                      "Exibir o ultimo backup feito (não é recomendável apaga-lo!)",
                   onPressed: () {
                     this.exibirUltimo = !this.exibirUltimo;
                     update();
@@ -71,7 +67,6 @@ class ArquivosViewState extends State<ArquivosView> {
             ]), // AppBar
         floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.green,
-            tooltip: "Apagar tudo!",
             child: Icon(Icons.delete_sweep),
             onPressed: () => arquivos.forEach((arq) => chan.add(arq))),
         body: this.arquivos.length == 0
