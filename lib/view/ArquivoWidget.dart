@@ -15,12 +15,12 @@ class ArquivoWidget extends StatelessWidget {
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
         title: Row(children: <Widget>[
-          Icon(arquivo.isUltimo ? Icons.warning : Icons.history),
+          Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
           Text(texto, style: TextStyle(fontSize: 36) // TextStyle
               ), // Text
         ]), // Row
         subtitle: Row(children: <Widget>[
-          Icon(Icons.sd_card),
+          Icon(Icons.sd_card, size: 36),
           Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
               ) // Text
         ]) // Row
@@ -29,7 +29,18 @@ class ArquivoWidget extends StatelessWidget {
         child: Dismissible(
             key: Key(this.arquivo.arquivo.path),
             child: Center(child: elemento),
-            background: Container(color: Colors.red, child: Icon(Icons.delete)),
+            background: Container(
+                alignment: Alignment.centerLeft,
+                color: Colors.red,
+                child: Icon(Icons.delete, size: 36), // Icon
+                padding: EdgeInsets.symmetric(horizontal: 30)
+            ), // Container
+            secondaryBackground: Container(
+                alignment: Alignment.centerRight, 
+                color: Colors.red, 
+                child: Icon(Icons.delete,size: 36),
+                padding: EdgeInsets.symmetric(horizontal: 30)
+            ),
             confirmDismiss: ((_) async {
               var sc = SnackbarController(
                   ctx,

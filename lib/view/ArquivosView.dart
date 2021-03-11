@@ -29,6 +29,7 @@ class ArquivosViewState extends State<ArquivosView> {
 
   update() async {
     this.setState(() => this.arquivos = updateArquivos());
+    // this.setState(() => this.arquivos = []);
   }
 
   listen() async {
@@ -71,7 +72,7 @@ class ArquivosViewState extends State<ArquivosView> {
         floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.green,
             tooltip: "Apagar tudo!",
-            child: Icon(Icons.delete),
+            child: Icon(Icons.delete_sweep),
             onPressed: () => arquivos.forEach((arq) => chan.add(arq))),
         body: this.arquivos.length == 0
             ? SemArquivosWidget()
