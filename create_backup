@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euf -o pipefail
+
+MB=$1;shift
+adb shell mkdir -p /sdcard/WhatsApp/Databases
+adb shell dd if=/dev/zero of=/sdcard/WhatsApp/Databases/msgstore-$RANDOM-$RANDOM-$RANDOM.1.db.crypt12 bs=1m count=$MB
