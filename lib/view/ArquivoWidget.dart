@@ -14,16 +14,22 @@ class ArquivoWidget extends StatelessWidget {
         "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
-        title: Row(children: <Widget>[
-          Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
-          Text(texto, style: TextStyle(fontSize: 36) // TextStyle
-              ), // Text
-        ]), // Row
+        title: FittedBox(child:
+            Row(children: <Widget>[
+                Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
+                Text(
+                    texto, 
+                    style: TextStyle(fontSize: 36), // TextStyle
+                ), // Text
+            ]), // Row
+        ), // FittedBox
         subtitle: Row(children: <Widget>[
           Icon(Icons.sd_card, size: 36),
-          Text(tamanho, style: TextStyle(fontSize: 28) // TextStyle
+          Text(
+                  tamanho,
+                  style: TextStyle(fontSize: 28), // TextStyle
               ) // Text
-        ]) // Row
+        ], ) // Row
         ); // ListTile
     return Center(
         child: Dismissible(
