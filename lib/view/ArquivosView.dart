@@ -41,7 +41,7 @@ class ArquivosViewState extends State<ArquivosView> {
   Widget build(BuildContext ctx) {
     return Scaffold(
         appBar: AppBar(
-            title: Text("Limpador de WhatsApp", overflow: TextOverflow.visible),
+            title: Text("Limpazap", overflow: TextOverflow.visible),
             backgroundColor: Colors.green,
             actions: <Widget>[
               IconButton(
