@@ -26,6 +26,7 @@ dependencies:
   cupertino_icons: ^1.0.0
   permission_handler: ^5.0.1+1
   flutter_launcher_icons: "^0.7.5" # workaround: this doesn't get downloaded on fdroid
+  wakelock: ^0.2.1+1 # for dev mode
 
 dev_dependencies:
   flutter_test:

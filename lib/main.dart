@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'view/ArquivosView.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
+
+import 'package:wakelock/wakelock.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
-  await WidgetsFlutterBinding.ensureInitialized();
-  await checar_permissao();
-  runApp(
-    MaterialApp(home: ArquivosView())
-  );
+    await WidgetsFlutterBinding.ensureInitialized();
+    if (!kReleaseMode) {
+        await Wakelock.enable();
+    }
+    await checar_permissao();
+    runApp(
+            MaterialApp(home: ArquivosView())
+    );
 }
 
 Future<void> checar_permissao() async {
