@@ -14,15 +14,21 @@ class ArquivoWidget extends StatelessWidget {
         "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
     var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
     var elemento = ListTile(
-        title: FittedBox(child:
-            Row(children: <Widget>[
+        title: ConstrainedBox(
+                constraints: BoxConstraints(
+                        maxHeight: 50
+                ),
+                child: FittedBox(
+                        alignment: Alignment.centerLeft,
+                        child: Row(children: <Widget>[
                 Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
                 Text(
                     texto, 
                     style: TextStyle(fontSize: 36), // TextStyle
                 ), // Text
             ]), // Row
-        ), // FittedBox
+        ) // FittedBox
+                ), // ConstrainedBox
         subtitle: Row(children: <Widget>[
           Icon(Icons.sd_card, size: 36),
           Text(
