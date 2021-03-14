@@ -12,7 +12,7 @@ Para quem não sabe, o WhatsApp necessita fazer backup das conversas por que nã
 
 As letras grandes foram um feedback recebido por potenciais usuários que já não tem uma visão tão boa.
 
-![Demonstração do APP](demo.webp)
+![Demonstração do APP](demo.webm)
 
 
 # TODO
