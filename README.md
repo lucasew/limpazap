@@ -14,6 +14,9 @@ As letras grandes foram um feedback recebido por potenciais usuários que já n�
 
 ![Demonstração do APP](demo.webm)
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="70">](https://f-droid.org/packages/com.lucao.limpazap/)
 
 # TODO
 - [ ] Mandar para a PlayStore
