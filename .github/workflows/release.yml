@@ -22,8 +22,6 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: stable
-        flutter-version-file: pubspec.yaml # path to pubspec.yaml
-
     - run: flutter pub get
     - run: flutter pub run flutter_launcher_icons:main
 #    - run: flutter test
