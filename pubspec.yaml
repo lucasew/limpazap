@@ -15,7 +15,7 @@ publish_to: 'none'
 version: 3.0.1+13
 
 environment:
-  sdk: "<4.0.0"
+  sdk: '^3.8.0'
 
 dependencies:
   flutter:
