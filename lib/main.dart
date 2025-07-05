@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'view/ArquivosView.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flutter/foundation.dart';
 
 void main() async {
     await WidgetsFlutterBinding.ensureInitialized();
     if (!kReleaseMode) {
-        await Wakelock.enable();
+        await WakelockPlus.enable();
     }
     await checar_permissao();
     runApp(
