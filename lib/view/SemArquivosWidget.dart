@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../controller/SnackbarController.dart';
 
 class SemArquivosWidget extends StatelessWidget {
   Widget build(BuildContext ctx) {

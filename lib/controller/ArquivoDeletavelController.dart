@@ -6,7 +6,7 @@ class ArquivoDeletavelController {
       RegExp("msgstore-"); // O nome dos backups antigos bate com esse aqui
   bool inverter;
   bool exibirUltimo;
-  ArquivoDeletavelController({this.inverter: false, this.exibirUltimo: false});
+  ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
   static const pastas = [
     "/sdcard/WhatsApp/Databases",
     "/sdcard/GBWhatsApp/Databases",

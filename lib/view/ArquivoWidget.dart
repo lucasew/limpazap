@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
-import '../controller/SnackbarController.dart';
 import 'dart:async';
 
 class ArquivoWidget extends StatelessWidget {

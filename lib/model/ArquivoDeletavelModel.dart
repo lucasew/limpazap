@@ -1,12 +1,13 @@
 import 'dart:io';
 
 class ArquivoDeletavel {
-  final File arquivo;
-  DateTime dataCriacao;
-  int tamanho;
-  bool isUltimo;
-  ArquivoDeletavel(this.arquivo, {this.isUltimo: false}) {
-    this.dataCriacao = this.arquivo.lastModifiedSync();
-    this.tamanho = this.arquivo.lengthSync();
+  final FileSystemEntity arquivo;
+  late DateTime dataCriacao;
+  late int tamanho;
+  late bool isUltimo;
+  ArquivoDeletavel(this.arquivo, {this.isUltimo = false}) {
+    var stat = this.arquivo.statSync();
+    this.dataCriacao = stat.modified;
+    this.tamanho = stat.size;
   }
 }
