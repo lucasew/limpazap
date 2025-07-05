@@ -8,9 +8,9 @@ class ArquivoDeletavelController {
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
   static const pastas = [
+    "/sdcard/Android/media/com.whatsapp/WhatsApp/Databases",
     "/sdcard/WhatsApp/Databases",
-    "/sdcard/GBWhatsApp/Databases",
-    "/sdcard/Android/media/com.whatsapp/WhatsApp/Databases"
+    "/sdcard/GBWhatsApp/Databases"
   ];
 
   List<ArquivoDeletavel> get arquivos {

@@ -10,13 +10,13 @@ void main() async {
     if (!kReleaseMode) {
         await WakelockPlus.enable();
     }
-    await checar_permissao();
+    await checarPermissao();
     runApp(
             MaterialApp(home: ArquivosView())
     );
 }
 
-Future<void> checar_permissao() async {
+Future<void> checarPermissao() async {
     while (true) {
         if (await Permission.storage.status.isGranted) {
             return;
