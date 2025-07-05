@@ -16,7 +16,7 @@ jobs:
       
     - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
+        java-version: '22.x'
         distribution: 'zulu'
 
     - uses: subosito/flutter-action@v2
