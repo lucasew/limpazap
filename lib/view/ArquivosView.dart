@@ -9,6 +9,7 @@ class ArquivosView extends StatefulWidget {
   createState() => ArquivosViewState();
 }
 
+
 class ArquivosViewState extends State<ArquivosView> {
   final chan = new StreamController<ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
   List<ArquivoDeletavel> arquivos = [];
