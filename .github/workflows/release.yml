@@ -31,7 +31,7 @@ jobs:
     - name: Create a Release APK
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/app/outputs/apk/release/*.apk buid/app/outputs/bundle/release/*.aab"
+        artifacts: "build/app/outputs/bundle/release/app-release.aab  build/app/outputs/flutter-apk/app-release.apk"
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
