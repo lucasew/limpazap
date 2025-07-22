@@ -26,11 +26,12 @@ jobs:
     - run: flutter pub run flutter_launcher_icons:main
 #    - run: flutter test
     - run: flutter build apk --release
+    - run: flutter build appbundle --release
       
     - name: Create a Release APK
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "build/app/outputs/apk/*/*.apk"
+        artifacts: "build/app/outputs/{apk/release/*.apk,bundle/release/*.aab}"
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
