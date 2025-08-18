@@ -9,6 +9,7 @@ class ArquivoDeletavelController {
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
   static const pastas = [
     "/sdcard/Android/media/com.whatsapp/WhatsApp/Databases",
+    "/sdcard/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
     "/sdcard/WhatsApp/Databases",
     "/sdcard/GBWhatsApp/Databases"
   ];
