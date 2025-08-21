@@ -14,7 +14,7 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
       
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         java-version: '22.x'
         distribution: 'zulu'
