@@ -19,4 +19,4 @@ As letras grandes foram um feedback recebido por potenciais usuários que já n�
      height="70">](https://f-droid.org/packages/com.lucao.limpazap/)
 
 # TODO
-- [ ] Mandar para a PlayStore
+- [ ] [Mandar para a PlayStore](https://github.com/lucasew/limpazap/issues/41)
