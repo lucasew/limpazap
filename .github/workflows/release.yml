@@ -8,20 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    - name: Setup environment
+      uses: jdx/mise-action@v2
       
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
       
-    - uses: actions/setup-java@v5
-      with:
-        java-version: '22.x'
-        distribution: 'zulu'
-
-    - uses: subosito/flutter-action@v2
-      with:
-        channel: stable
     - run: flutter pub get
     - run: flutter pub run flutter_launcher_icons:main
 #    - run: flutter test
