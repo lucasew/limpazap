@@ -11,6 +11,9 @@ jobs:
     - name: Setup environment
       uses: jdx/mise-action@v2
       
+    - name: Setup the Android SDK part that sucks
+      run: mise run setup-androidsdk
+
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"

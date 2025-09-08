@@ -4,3 +4,6 @@ flutter = "3.35.3-stable"
 java = "25.0.0"
 usage = "latest"
 yq = "latest"
+
+[tasks.setup-androidsdk]
+run = "sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
