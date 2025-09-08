@@ -6,4 +6,4 @@ usage = "latest"
 yq = "latest"
 
 [tasks.setup-androidsdk]
-run = "sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
+run = "yes | sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
