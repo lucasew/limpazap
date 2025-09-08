@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup environment
-      uses: jdx/mise-action@v2
+      uses: jdx/mise-action@v3
       
     - name: Setup the Android SDK part that sucks
       run: mise run setup-androidsdk
