@@ -7,9 +7,9 @@ jobs:
     name: Build APK
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
     - name: Setup environment
-      uses: jdx/mise-action@v3
+      uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3
       
     - name: Setup the Android SDK part that sucks
       run: mise run setup-androidsdk
@@ -26,7 +26,7 @@ jobs:
     - run: flutter build appbundle --release
       
     - name: Create a Release APK
-      uses: ncipollo/release-action@v1
+      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
       with:
         artifacts: "build/app/outputs/bundle/release/app-release.aab,build/app/outputs/flutter-apk/app-release.apk"
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
