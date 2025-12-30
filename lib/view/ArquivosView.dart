@@ -11,68 +11,102 @@ class ArquivosView extends StatefulWidget {
 
 
 class ArquivosViewState extends State<ArquivosView> {
-  final chan = new StreamController<ArquivoDeletavel>(); // Esse cara recebe os eventos do que tenque apagar, dps ele atualiza os widgets
-  List<ArquivoDeletavel> arquivos = [];
+  final chan = StreamController<ArquivoDeletavel>();
+  Future<List<ArquivoDeletavel>>? arquivosFuture;
   bool inverter = false;
   bool exibirUltimo = false;
 
-  ArquivosViewState() {
+  @override
+  void initState() {
+    super.initState();
     listen();
-    this.arquivos = updateArquivos();
+    loadArquivos();
   }
 
-  List<ArquivoDeletavel> updateArquivos() {
-    return ArquivoDeletavelController(
-            inverter: this.inverter, exibirUltimo: this.exibirUltimo)
-        .arquivos;
+  void loadArquivos() {
+    setState(() {
+      arquivosFuture = ArquivoDeletavelController(
+        inverter: inverter,
+        exibirUltimo: exibirUltimo,
+      ).getArquivos();
+    });
   }
 
-  update() async {
-    this.setState(() => this.arquivos = updateArquivos());
-    // this.setState(() => this.arquivos = []);
+  void update() {
+    loadArquivos();
   }
 
-  listen() async {
-    chan.stream.listen((ad) {
-      ad.arquivo.deleteSync();
+  void listen() {
+    chan.stream.listen((ad) async {
+      await ad.arquivo.delete();
       update();
     });
   }
 
-  Widget build(BuildContext ctx) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: Text("Limpazap", overflow: TextOverflow.visible),
-            backgroundColor: Colors.green,
-            actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.refresh),
-                  onPressed: update
-              ),
-              IconButton(
-                  icon: Icon(this.inverter
-                      ? Icons.fast_forward
-                      : Icons.fast_rewind), // Icon
-                  onPressed: () {
-                    this.inverter = !this.inverter;
-                    update();
-                  }), // IconButton
-              IconButton(
-                  icon: Icon(this.exibirUltimo
-                      ? Icons.visibility_off
-                      : Icons.visibility),
-                  onPressed: () {
-                    this.exibirUltimo = !this.exibirUltimo;
-                    update();
-                  })
-            ]), // AppBar
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.green,
-            child: Icon(Icons.delete_sweep),
-            onPressed: () => arquivos.forEach((arq) => chan.add(arq))),
-        body: this.arquivos.length == 0
-            ? SemArquivosWidget()
-            : ArquivosWidget(this.arquivos, chan) // ArquivosWidget
-        ); // Scaffold
+      appBar: AppBar(
+        title: const Text("Limpazap", overflow: TextOverflow.visible),
+        backgroundColor: Colors.green,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: update,
+          ),
+          IconButton(
+            icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
+            onPressed: () {
+              setState(() {
+                inverter = !inverter;
+              });
+              update();
+            },
+          ),
+          IconButton(
+            icon: Icon(exibirUltimo ? Icons.visibility_off : Icons.visibility),
+            onPressed: () {
+              setState(() {
+                exibirUltimo = !exibirUltimo;
+              });
+              update();
+            },
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<ArquivoDeletavel>>(
+        future: arquivosFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Erro: ${snapshot.error}"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return SemArquivosWidget();
+          } else {
+            final arquivos = snapshot.data!;
+            return ArquivosWidget(arquivos, chan);
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.delete_sweep),
+        onPressed: () async {
+          final arquivos = await arquivosFuture;
+          if (arquivos != null) {
+            for (var arq in arquivos) {
+              chan.add(arq);
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    chan.close();
+    super.dispose();
   }
 }
