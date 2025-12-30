@@ -1,5 +1,6 @@
-import '../model/ArquivoDeletavelModel.dart';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
   final dbAntigo =
@@ -7,14 +8,25 @@ class ArquivoDeletavelController {
   bool inverter;
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
-  static const pastas = [
-    "/sdcard/Android/media/com.whatsapp/WhatsApp/Databases",
-    "/sdcard/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
-    "/sdcard/WhatsApp/Databases",
-    "/sdcard/GBWhatsApp/Databases"
-  ];
 
-  List<ArquivoDeletavel> get arquivos {
+  Future<List<String>> get _pastas async {
+    // SECURITY: Use path_provider to avoid hardcoded paths.
+    // Hardcoding `/sdcard/` is unreliable across Android versions.
+    final Directory? externalDir = await getExternalStorageDirectory();
+    if (externalDir == null) {
+      return [];
+    }
+    final String basePath = externalDir.path.split('/Android/')[0];
+    return [
+      "$basePath/Android/media/com.whatsapp/WhatsApp/Databases",
+      "$basePath/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
+      "$basePath/WhatsApp/Databases",
+      "$basePath/GBWhatsApp/Databases",
+    ];
+  }
+
+  Future<List<ArquivoDeletavel>> getArquivos() async {
+    final pastas = await _pastas;
     var ret = pastas
         .map((p) => Directory(p)) // Transforma tudo em Directory
         .where((p) => p.existsSync()) // Filtra só os que existem
