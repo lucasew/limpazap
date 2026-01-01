@@ -12,17 +12,21 @@ class ArquivoDeletavelController {
   Future<List<String>> get _pastas async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
     // Hardcoding `/sdcard/` is unreliable across Android versions.
-    final Directory? externalDir = await getExternalStorageDirectory();
-    if (externalDir == null) {
+    final List<Directory>? externalDirs = await getExternalStorageDirectories();
+    if (externalDirs == null) {
       return [];
     }
-    final String basePath = externalDir.path.split('/Android/')[0];
-    return [
-      "$basePath/Android/media/com.whatsapp/WhatsApp/Databases",
-      "$basePath/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
-      "$basePath/WhatsApp/Databases",
-      "$basePath/GBWhatsApp/Databases",
-    ];
+
+    return externalDirs
+        .map((dir) => dir.path.split('/Android/')[0])
+        .expand((basePath) => [
+              "$basePath/Android/media/com.whatsapp/WhatsApp/Databases",
+              "$basePath/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
+              "$basePath/WhatsApp/Databases",
+              "$basePath/GBWhatsApp/Databases",
+            ])
+        .toSet()
+        .toList();
   }
 
   Future<List<ArquivoDeletavel>> getArquivos() async {
