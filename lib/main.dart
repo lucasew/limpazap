@@ -6,18 +6,26 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> checarPermissao() async {
-    while (true) {
-        if (!await Permission.manageExternalStorage.status.isGranted) {
-          Permission.manageExternalStorage.request();
-        }
-        if (await Permission.storage.status.isGranted) {
-            return;
-        } else if (await Permission.storage.isPermanentlyDenied) {
-            await openAppSettings();
-        } else {
-            print(await Permission.storage.request());
-        }
-    }
+  // Request `manageExternalStorage` first for modern Android versions.
+  if (!await Permission.manageExternalStorage.status.isGranted) {
+    await Permission.manageExternalStorage.request();
+  }
+
+  // Then, check for the general storage permission.
+  if (await Permission.storage.status.isGranted) {
+    return; // Exit if permission is granted.
+  }
+
+  // If storage permission is permanently denied, guide the user to settings.
+  if (await Permission.storage.isPermanentlyDenied) {
+    await openAppSettings();
+    return;
+  }
+
+  // Otherwise, request the storage permission.
+  final status = await Permission.storage.request();
+  // Use debugPrint to log permission status only in debug mode.
+  debugPrint('Storage permission request result: $status');
 }
 
 void main() async {
@@ -25,7 +33,7 @@ void main() async {
     if (!kReleaseMode) {
         await WakelockPlus.enable();
     }
-    checarPermissao();
+    await checarPermissao();
     runApp(
             MaterialApp(home: ArquivosView())
     );
