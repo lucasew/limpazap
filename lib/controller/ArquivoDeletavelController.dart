@@ -3,8 +3,8 @@ import 'package:path_provider/path_provider.dart';
 import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
-  final dbAntigo =
-      RegExp("msgstore-"); // O nome dos backups antigos bate com esse aqui
+  // The name of old backups matches this regex.
+  final dbAntigo = RegExp("msgstore-");
   bool inverter;
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
@@ -27,24 +27,27 @@ class ArquivoDeletavelController {
 
   Future<List<ArquivoDeletavel>> getArquivos() async {
     final pastas = await _pastas;
-    var ret = pastas
-        .map((p) => Directory(p)) // Transforma tudo em Directory
-        .where((p) => p.existsSync()) // Filtra só os que existem
-        .map((p) => p.listSync()) // Dá ls em todas as pastas
-        .expand(
-            (att) => att) // Teremos uma lista de listas, agora não mais hehe
-        .map((arq) => ArquivoDeletavel(arq,
-            isUltimo: !dbAntigo.hasMatch(
-                arq.path))) // Gera model verificando se é backup antigo ou não
-        .where((a) =>
-            this.exibirUltimo ||
-            dbAntigo.hasMatch(
-                a.arquivo.path)) // Ignora o ultimo backup se especificado
-        .toList(); // Expande o iterador
-    ret.sort(
-        (x, y) => x.dataCriacao.compareTo(y.dataCriacao)); // Ordena todo mundo
-    return this.inverter
-        ? ret.reversed.toList()
-        : ret; // Inverte se especificado e retorna
+
+    // Convert paths to Directory objects and filter out non-existent ones.
+    final existingDirectories =
+        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
+
+    // List files from all existing directories, creating a single flat list.
+    final allFiles = existingDirectories.expand((dir) => dir.listSync());
+
+    // Map files to the ArquivoDeletavel model, identifying old backups.
+    var deletableFiles = allFiles
+        .map((file) =>
+            ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
+        // If 'exibirUltimo' is false, filter out the most recent backup.
+        .where(
+            (file) => this.exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
+        .toList();
+
+    // Sort files by creation date.
+    deletableFiles.sort((a, b) => a.dataCriacao.compareTo(b.dataCriacao));
+
+    // Reverse the list if specified and return.
+    return this.inverter ? deletableFiles.reversed.toList() : deletableFiles;
   }
 }
