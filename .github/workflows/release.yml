@@ -29,9 +29,9 @@ jobs:
       uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
       with:
         artifacts: "build/app/outputs/bundle/release/app-release.aab,build/app/outputs/flutter-apk/app-release.apk"
-        name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
+        name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('Compilação automática {0} para branch {1}', github.sha, steps.extract_branch.outputs.branch) }}
         token: ${{ secrets.GITHUB_TOKEN }}
         commit: ${{ steps.extract_branch.outputs.branch }}
-        tag: commit-${{ github.sha }}
+        tag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('commit-{0}', github.sha) }}
         draft: true
         prerelease: true

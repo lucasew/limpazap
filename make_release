@@ -1,98 +1,99 @@
-#!/usr/bin/env python3
-import sys
-import re
-import subprocess
-import argparse
+#!/usr/bin/env bash
 
-def get_current_version(pubspec_path):
-    with open(pubspec_path, 'r') as f:
-        content = f.read()
+set -e
 
-    # Match version: x.y.z+n
-    match = re.search(r'^version: (\d+)\.(\d+)\.(\d+)\+(\d+)', content, re.MULTILINE)
-    if not match:
-        raise ValueError("Could not find version in pubspec.yaml")
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 [major|minor|patch|version_string] [--dry-run]"
+    exit 1
+fi
 
-    return {
-        'major': int(match.group(1)),
-        'minor': int(match.group(2)),
-        'patch': int(match.group(3)),
-        'build': int(match.group(4)),
-        'full_match': match.group(0),
-        'content': content
-    }
+DRY_RUN=false
+VERSION_ARG=""
 
-def increment_version(version_dict, part):
-    new_version = version_dict.copy()
-    new_version['build'] += 1
+for arg in "$@"; do
+    if [ "$arg" == "--dry-run" ]; then
+        DRY_RUN=true
+    else
+        VERSION_ARG="$arg"
+    fi
+done
 
-    if part == 'major':
-        new_version['major'] += 1
-        new_version['minor'] = 0
-        new_version['patch'] = 0
-    elif part == 'minor':
-        new_version['minor'] += 1
-        new_version['patch'] = 0
-    elif part == 'patch':
-        new_version['patch'] += 1
-    elif part:
-        # Assuming specific version string passed (though prompt focused on strategies)
-        # This part is tricky if we want to support "set to specific version".
-        # But the strategies usually just bump.
-        # Let's try to parse the specific version if it looks like x.y.z
-        parts = part.split('.')
-        if len(parts) == 3:
-             new_version['major'] = int(parts[0])
-             new_version['minor'] = int(parts[1])
-             new_version['patch'] = int(parts[2])
-        else:
-             print(f"Unknown increment type or invalid version format: {part}")
-             sys.exit(1)
+if [ -z "$VERSION_ARG" ]; then
+    echo "Error: version argument required"
+    exit 1
+fi
 
-    return new_version
+PUBSPEC="pubspec.yaml"
 
-def update_pubspec(pubspec_path, old_version_dict, new_version_dict):
-    new_version_str = f"version: {new_version_dict['major']}.{new_version_dict['minor']}.{new_version_dict['patch']}+{new_version_dict['build']}"
-    new_content = old_version_dict['content'].replace(old_version_dict['full_match'], new_version_str)
+if [ ! -f "$PUBSPEC" ]; then
+    echo "Error: $PUBSPEC not found"
+    exit 1
+fi
 
-    with open(pubspec_path, 'w') as f:
-        f.write(new_content)
+# Read current version line: version: x.y.z+n or x.y.z
+VERSION_LINE=$(grep "^version: " "$PUBSPEC")
+CURRENT_VERSION_FULL=$(echo "$VERSION_LINE" | awk '{print $2}')
 
-    return f"{new_version_dict['major']}.{new_version_dict['minor']}.{new_version_dict['patch']}+{new_version_dict['build']}"
+if [[ "$CURRENT_VERSION_FULL" == *"+"* ]]; then
+    SEM_VER=$(echo "$CURRENT_VERSION_FULL" | cut -d+ -f1)
+    BUILD_NUM=$(echo "$CURRENT_VERSION_FULL" | cut -d+ -f2)
+else
+    SEM_VER="$CURRENT_VERSION_FULL"
+    BUILD_NUM=0
+fi
 
-def run_command(cmd, dry_run=False):
-    print(f"Running: {cmd}")
-    if not dry_run:
-        subprocess.check_call(cmd, shell=True)
+# Split semantic version by '.'
+IFS='.' read -r MAJOR MINOR PATCH <<< "$SEM_VER"
 
-def main():
-    parser = argparse.ArgumentParser(description='Bump version and release.')
-    parser.add_argument('part', help='major, minor, patch, or specific version')
-    parser.add_argument('--dry-run', action='store_true', help='Do not write to file or git commit/push')
+# Increment build number
+NEW_BUILD_NUM=$((BUILD_NUM + 1))
 
-    args = parser.parse_args()
+case "$VERSION_ARG" in
+    major)
+        NEW_MAJOR=$((MAJOR + 1))
+        NEW_MINOR=0
+        NEW_PATCH=0
+        ;;
+    minor)
+        NEW_MAJOR=$MAJOR
+        NEW_MINOR=$((MINOR + 1))
+        NEW_PATCH=0
+        ;;
+    patch)
+        NEW_MAJOR=$MAJOR
+        NEW_MINOR=$MINOR
+        NEW_PATCH=$((PATCH + 1))
+        ;;
+    *)
+        if [[ "$VERSION_ARG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            IFS='.' read -r NEW_MAJOR NEW_MINOR NEW_PATCH <<< "$VERSION_ARG"
+        else
+            echo "Error: Invalid argument '$VERSION_ARG'. Use major, minor, patch or x.y.z"
+            exit 1
+        fi
+        ;;
+esac
 
-    pubspec_path = 'pubspec.yaml'
+NEW_VERSION_FULL="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH+$NEW_BUILD_NUM"
 
-    try:
-        current_version = get_current_version(pubspec_path)
-    except Exception as e:
-        print(f"Error reading pubspec.yaml: {e}")
-        sys.exit(1)
+echo "Current version: $CURRENT_VERSION_FULL"
+echo "New version:     $NEW_VERSION_FULL"
 
-    new_version_dict = increment_version(current_version, args.part)
+if [ "$DRY_RUN" = true ]; then
+    echo "DRY RUN: Not modifying files or running git commands."
+    echo "Command: sed -i \"s/^version: .*/version: $NEW_VERSION_FULL/\" \"$PUBSPEC\""
+    echo "Command: git add \"$PUBSPEC\""
+    echo "Command: git commit -m \"bump to $NEW_VERSION_FULL\""
+    echo "Command: git tag \"$NEW_VERSION_FULL\""
+    echo "Command: git push"
+    echo "Command: git push --tags"
+else
+    # Update pubspec.yaml
+    sed -i "s/^version: .*/version: $NEW_VERSION_FULL/" "$PUBSPEC"
 
-    new_version_str = f"{new_version_dict['major']}.{new_version_dict['minor']}.{new_version_dict['patch']}+{new_version_dict['build']}"
-    print(f"New version: {new_version_str}")
-
-    if not args.dry_run:
-        update_pubspec(pubspec_path, current_version, new_version_dict)
-
-    run_command("git add pubspec.yaml", args.dry_run)
-    run_command(f'git commit -m "bump to {new_version_str}"', args.dry_run)
-    run_command(f'git tag "{new_version_str}"', args.dry_run)
-    run_command("git push", args.dry_run)
-    run_command("git push --tags", args.dry_run)
-
-if __name__ == '__main__':
-    main()
+    git add "$PUBSPEC"
+    git commit -m "bump to $NEW_VERSION_FULL"
+    git tag "$NEW_VERSION_FULL"
+    git push
+    git push --tags
+fi
