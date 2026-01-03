@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 [major|minor|patch|version_string] [--dry-run]"
+    exit 1
+fi
+
+DRY_RUN=false
+VERSION_ARG=""
+
+for arg in "$@"; do
+    if [ "$arg" == "--dry-run" ]; then
+        DRY_RUN=true
+    else
+        VERSION_ARG="$arg"
+    fi
+done
+
+if [ -z "$VERSION_ARG" ]; then
+    echo "Error: version argument required"
+    exit 1
+fi
+
+PUBSPEC="pubspec.yaml"
+
+if [ ! -f "$PUBSPEC" ]; then
+    echo "Error: $PUBSPEC not found"
+    exit 1
+fi
+
+# Read current version line: version: x.y.z+n or x.y.z
+VERSION_LINE=$(grep "^version: " "$PUBSPEC")
+CURRENT_VERSION_FULL=$(echo "$VERSION_LINE" | awk '{print $2}')
+
+if [[ "$CURRENT_VERSION_FULL" == *"+"* ]]; then
+    SEM_VER=$(echo "$CURRENT_VERSION_FULL" | cut -d+ -f1)
+    BUILD_NUM=$(echo "$CURRENT_VERSION_FULL" | cut -d+ -f2)
+else
+    SEM_VER="$CURRENT_VERSION_FULL"
+    BUILD_NUM=0
+fi
+
+# Split semantic version by '.'
+IFS='.' read -r MAJOR MINOR PATCH <<< "$SEM_VER"
+
+# Increment build number
+NEW_BUILD_NUM=$((BUILD_NUM + 1))
+
+case "$VERSION_ARG" in
+    major)
+        NEW_MAJOR=$((MAJOR + 1))
+        NEW_MINOR=0
+        NEW_PATCH=0
+        ;;
+    minor)
+        NEW_MAJOR=$MAJOR
+        NEW_MINOR=$((MINOR + 1))
+        NEW_PATCH=0
+        ;;
+    patch)
+        NEW_MAJOR=$MAJOR
+        NEW_MINOR=$MINOR
+        NEW_PATCH=$((PATCH + 1))
+        ;;
+    *)
+        if [[ "$VERSION_ARG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            IFS='.' read -r NEW_MAJOR NEW_MINOR NEW_PATCH <<< "$VERSION_ARG"
+        else
+            echo "Error: Invalid argument '$VERSION_ARG'. Use major, minor, patch or x.y.z"
+            exit 1
+        fi
+        ;;
+esac
+
+NEW_VERSION_FULL="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH+$NEW_BUILD_NUM"
+
+echo "Current version: $CURRENT_VERSION_FULL"
+echo "New version:     $NEW_VERSION_FULL"
+
+if [ "$DRY_RUN" = true ]; then
+    echo "DRY RUN: Not modifying files or running git commands."
+    echo "Command: sed -i \"s/^version: .*/version: $NEW_VERSION_FULL/\" \"$PUBSPEC\""
+    echo "Command: git add \"$PUBSPEC\""
+    echo "Command: git commit -m \"bump to $NEW_VERSION_FULL\""
+    echo "Command: git tag \"$NEW_VERSION_FULL\""
+    echo "Command: git push"
+    echo "Command: git push --tags"
+else
+    # Update pubspec.yaml
+    sed -i "s/^version: .*/version: $NEW_VERSION_FULL/" "$PUBSPEC"
+
+    git add "$PUBSPEC"
+    git commit -m "bump to $NEW_VERSION_FULL"
+    git tag "$NEW_VERSION_FULL"
+    git push
+    git push --tags
+fi
