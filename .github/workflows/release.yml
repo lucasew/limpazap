@@ -24,14 +24,22 @@ jobs:
 #    - run: flutter test
     - run: flutter build apk --release
     - run: flutter build appbundle --release
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Upload AppBundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-aab
+        path: build/app/outputs/bundle/release/app-release.aab
       
-    - name: Create a Release APK
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
       uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
       with:
         artifacts: "build/app/outputs/bundle/release/app-release.aab,build/app/outputs/flutter-apk/app-release.apk"
-        name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit: ${{ steps.extract_branch.outputs.branch }}
-        tag: commit-${{ github.sha }}
-        draft: true
-        prerelease: true

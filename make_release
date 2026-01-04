@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Reads version from pubspec.yaml
+VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+
+# Split version into base and build number
+BASE_VERSION=$(echo $VERSION | cut -d+ -f1)
+BUILD_NUMBER=$(echo $VERSION | cut -d+ -f2)
+
+# Increment build number
+NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+NEW_VERSION="${BASE_VERSION}+${NEW_BUILD_NUMBER}"
+
+# Update pubspec.yaml
+sed -i "s/version: $VERSION/version: $NEW_VERSION/" pubspec.yaml
+
+# Commit and tag
+git commit -am "release: $NEW_VERSION"
+git tag "v$NEW_VERSION"
+git push origin main
+git push origin "v$NEW_VERSION"
