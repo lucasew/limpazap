@@ -37,7 +37,16 @@ class ArquivoDeletavelController {
         pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
 
     // List files from all existing directories, creating a single flat list.
-    final allFiles = existingDirectories.expand((dir) => dir.listSync());
+    final allFiles = existingDirectories.expand((dir) {
+      try {
+        return dir.listSync();
+      } on FileSystemException catch (e) {
+        // Log the error and return an empty list to avoid crashing.
+        // This can happen if the directory is inaccessible.
+        print("Could not list files in ${dir.path}: $e");
+        return <FileSystemEntity>[];
+      }
+    });
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
     var deletableFiles = allFiles
