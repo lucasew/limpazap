@@ -6,6 +6,8 @@ jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
     - name: Setup environment
@@ -30,10 +32,12 @@ jobs:
       with:
         name: app-release-aab
         path: build/app/outputs/bundle/release/app-release.aab
-      
+
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
-      with:
-        artifacts: "build/app/outputs/bundle/release/app-release.aab,build/app/outputs/flutter-apk/app-release.apk"
-        token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ github.ref_name }}
+      run: |
+        gh release create "$TAG" --generate-notes
+        gh release upload "$TAG" build/app/outputs/flutter-apk/app-release.apk build/app/outputs/bundle/release/app-release.aab --clobber
