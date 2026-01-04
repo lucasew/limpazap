@@ -18,7 +18,16 @@ class ArquivoDeletavelController {
     }
 
     return externalDirs
-        .map((dir) => dir.path.split('/Android/')[0])
+        .map((dir) {
+          final path = dir.path;
+          final androidIndex = path.indexOf('/Android/');
+          if (androidIndex != -1) {
+            return path.substring(0, androidIndex);
+          }
+          return null;
+        })
+        .where((path) => path != null)
+        .cast<String>()
         .expand((basePath) => [
               "$basePath/Android/media/com.whatsapp/WhatsApp/Databases",
               "$basePath/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
