@@ -68,8 +68,8 @@ class ArquivoWidget extends StatelessWidget {
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
         child: Center(child: _buildListTile()),
-        background: _buildBackground(),
-        secondaryBackground: _buildSecondaryBackground(),
+        background: _buildDismissBackground(alignment: Alignment.centerLeft),
+        secondaryBackground: _buildDismissBackground(alignment: Alignment.centerRight),
         onDismissed: (_) {
           chan.add(arquivo);
         },
