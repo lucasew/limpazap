@@ -1,21 +1,83 @@
 #!/usr/bin/env bash
 
-# Reads version from pubspec.yaml
-VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+set -e
 
-# Split version into base and build number
-BASE_VERSION=$(echo $VERSION | cut -d+ -f1)
-BUILD_NUMBER=$(echo $VERSION | cut -d+ -f2)
+if [ $# == 1 ]; then
+    BUMP_TYPE="$1"; shift
+else
+    echo "Usage: $0 [patch|minor|major] or specific version"
+    exit 1
+fi
 
-# Increment build number
+# Read current version from pubspec.yaml
+# version: 4.1.0+17
+VERSION_LINE=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+FULL_VERSION=$VERSION_LINE
+
+# Split into version and build number
+BASE_VERSION=$(echo $FULL_VERSION | cut -d+ -f1)
+BUILD_NUMBER=$(echo $FULL_VERSION | cut -d+ -f2)
+
+IFS='.' read -r -a VERSION_PARTS <<< "$BASE_VERSION"
+
+MAJOR=${VERSION_PARTS[0]}
+MINOR=${VERSION_PARTS[1]}
+PATCH=${VERSION_PARTS[2]}
+
+# Calculate new version based on bump type
+case "$BUMP_TYPE" in
+    patch)
+        PATCH=$((PATCH + 1))
+        NEW_BASE_VERSION="$MAJOR.$MINOR.$PATCH"
+        ;;
+    minor)
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        NEW_BASE_VERSION="$MAJOR.$MINOR.$PATCH"
+        ;;
+    major)
+        MAJOR=$((MAJOR + 1))
+        MINOR=0
+        PATCH=0
+        NEW_BASE_VERSION="$MAJOR.$MINOR.$PATCH"
+        ;;
+    *)
+        # Assume it is a specific version string, but we still need to handle build number
+        # If user passes 5.0.0, we use it as base
+        if [[ "$BUMP_TYPE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+             NEW_BASE_VERSION="$BUMP_TYPE"
+        else
+             echo "Invalid bump type: $BUMP_TYPE"
+             echo "Usage: $0 [patch|minor|major] or X.Y.Z"
+             exit 1
+        fi
+        ;;
+esac
+
+# Always increment build number
 NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
-NEW_VERSION="${BASE_VERSION}+${NEW_BUILD_NUMBER}"
+NEW_VERSION="${NEW_BASE_VERSION}+${NEW_BUILD_NUMBER}"
+
+echo "Bumping version from $FULL_VERSION to $NEW_VERSION"
 
 # Update pubspec.yaml
-sed -i "s/version: $VERSION/version: $NEW_VERSION/" pubspec.yaml
+sed -i "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
 
-# Commit and tag
-git commit -am "release: $NEW_VERSION"
-git tag "v$NEW_VERSION"
-git push origin main
-git push origin "v$NEW_VERSION"
+echo "Updated pubspec.yaml to $NEW_VERSION"
+
+# Git operations
+git add pubspec.yaml
+git commit -m "bump to $NEW_VERSION"
+
+# Create and push tag unless NO_TAG is set
+if [ -z "$NO_TAG" ]; then
+    git tag "v$NEW_VERSION"
+    echo "Created tag v$NEW_VERSION"
+fi
+
+git push
+if [ -z "$NO_TAG" ]; then
+    git push --tags
+fi
+
+echo "✅ Successfully released version $NEW_VERSION"
