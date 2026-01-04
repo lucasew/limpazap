@@ -53,18 +53,9 @@ class ArquivoWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildBackground() {
+  Widget _buildDismissBackground({required AlignmentGeometry alignment}) {
     return Container(
-      alignment: Alignment.centerLeft,
-      color: Colors.red,
-      child: const Icon(Icons.delete, size: 36),
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-    );
-  }
-
-  Widget _buildSecondaryBackground() {
-    return Container(
-      alignment: Alignment.centerRight,
+      alignment: alignment,
       color: Colors.red,
       child: const Icon(Icons.delete, size: 36),
       padding: const EdgeInsets.symmetric(horizontal: 30),
