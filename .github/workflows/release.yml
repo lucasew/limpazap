@@ -14,14 +14,8 @@ jobs:
     - name: Setup the Android SDK part that sucks
       run: mise run setup-androidsdk
 
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-      
     - run: flutter pub get
     - run: flutter pub run flutter_launcher_icons:main
-#    - run: flutter test
     - run: flutter build apk --release
     - run: flutter build appbundle --release
 
