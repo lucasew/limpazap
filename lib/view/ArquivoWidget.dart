@@ -7,54 +7,73 @@ class ArquivoWidget extends StatelessWidget {
   final StreamController<ArquivoDeletavel> chan;
   ArquivoWidget(this.arquivo, this.chan);
 
-  Widget build(BuildContext ctx) {
+  String get _textoDataCriacao {
     var d = arquivo.dataCriacao;
-    var texto =
-        "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute < 10 ? '0' : ''}${d.minute}";
-    var tamanho = "${(this.arquivo.tamanho / 1000000).round()} MB";
-    var elemento = ListTile(
-        title: ConstrainedBox(
-                constraints: BoxConstraints(
-                        maxHeight: 50
-                ),
-                child: FittedBox(
-                        alignment: Alignment.centerLeft,
-                        child: Row(children: <Widget>[
-                Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
-                Text(
-                    texto, 
-                    style: TextStyle(fontSize: 36), // TextStyle
-                ), // Text
-            ]), // Row
-        ) // FittedBox
-                ), // ConstrainedBox
-        subtitle: Row(children: <Widget>[
-          Icon(Icons.sd_card, size: 36),
-          Text(
-                  tamanho,
-                  style: TextStyle(fontSize: 28), // TextStyle
-              ) // Text
-        ], ) // Row
-        ); // ListTile
-    return Center(
-        child: Dismissible(
-            key: Key(this.arquivo.arquivo.path),
-            child: Center(child: elemento),
-            background: Container(
-                alignment: Alignment.centerLeft,
-                color: Colors.red,
-                child: Icon(Icons.delete, size: 36), // Icon
-                padding: EdgeInsets.symmetric(horizontal: 30)
-            ), // Container
-            secondaryBackground: Container(
-                alignment: Alignment.centerRight, 
-                color: Colors.red, 
-                child: Icon(Icons.delete,size: 36),
-                padding: EdgeInsets.symmetric(horizontal: 30)
+    return "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}";
+  }
+
+  String get _textoTamanho {
+    return "${(arquivo.tamanho / 1000000).round()} MB";
+  }
+
+  Widget _buildTitle() {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 50),
+      child: FittedBox(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: <Widget>[
+            Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
+            Text(
+              _textoDataCriacao,
+              style: const TextStyle(fontSize: 36),
             ),
-            onDismissed: (_) {
-              chan.add(this.arquivo);
-            }) // Dismissible
-        );
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Row(
+      children: <Widget>[
+        const Icon(Icons.sd_card, size: 36),
+        Text(
+          _textoTamanho,
+          style: const TextStyle(fontSize: 28),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildListTile() {
+    return ListTile(
+      title: _buildTitle(),
+      subtitle: _buildSubtitle(),
+    );
+  }
+
+  Widget _buildDismissBackground({required AlignmentGeometry alignment}) {
+    return Container(
+      alignment: alignment,
+      color: Colors.red,
+      child: const Icon(Icons.delete, size: 36),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+    );
+  }
+
+  @override
+  Widget build(BuildContext ctx) {
+    return Center(
+      child: Dismissible(
+        key: Key(arquivo.arquivo.path),
+        child: Center(child: _buildListTile()),
+        background: _buildDismissBackground(alignment: Alignment.centerLeft),
+        secondaryBackground: _buildDismissBackground(alignment: Alignment.centerRight),
+        onDismissed: (_) {
+          chan.add(arquivo);
+        },
+      ),
+    );
   }
 }
