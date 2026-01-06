@@ -38,9 +38,35 @@ class ArquivosViewState extends State<ArquivosView> {
 
   void listen() {
     chan.stream.listen((ad) async {
-      await ad.arquivo.delete();
-      update();
+      final confirm = await _showConfirmationDialog(
+          "Deseja realmente apagar este arquivo?", context);
+      if (confirm == true) {
+        await ad.arquivo.delete();
+        update();
+      }
     });
+  }
+
+  Future<bool?> _showConfirmationDialog(String message, BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmação"),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: const Text("Apagar"),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -93,10 +119,14 @@ class ArquivosViewState extends State<ArquivosView> {
         backgroundColor: Colors.green,
         child: const Icon(Icons.delete_sweep),
         onPressed: () async {
-          final arquivos = await arquivosFuture;
-          if (arquivos != null) {
-            for (var arq in arquivos) {
-              chan.add(arq);
+          final confirm = await _showConfirmationDialog(
+              "Deseja realmente apagar todos os arquivos?", context);
+          if (confirm == true) {
+            final arquivos = await arquivosFuture;
+            if (arquivos != null) {
+              for (var arq in arquivos) {
+                chan.add(arq);
+              }
             }
           }
         },
