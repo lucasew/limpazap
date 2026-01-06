@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import '../model/ArquivoDeletavelModel.dart';
 
@@ -43,7 +44,7 @@ class ArquivoDeletavelController {
       } on FileSystemException catch (e) {
         // Log the error and return an empty list to avoid crashing.
         // This can happen if the directory is inaccessible.
-        print("Could not list files in ${dir.path}: $e");
+        debugPrint("Could not list files in ${dir.path}: $e");
         return <FileSystemEntity>[];
       }
     });
