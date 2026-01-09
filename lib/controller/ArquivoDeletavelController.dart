@@ -30,38 +30,40 @@ class ArquivoDeletavelController {
         .toList();
   }
 
-  Future<List<ArquivoDeletavel>> getArquivos() async {
-    final pastas = await _pastas;
-
-    // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories =
-        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
-
-    // List files from all existing directories, creating a single flat list.
-    final allFiles = existingDirectories.expand((dir) {
+  Iterable<FileSystemEntity> _getAllFiles(Iterable<Directory> directories) {
+    return directories.expand((dir) {
       try {
         return dir.listSync();
       } on FileSystemException catch (e) {
-        // Log the error and return an empty list to avoid crashing.
-        // This can happen if the directory is inaccessible.
         debugPrint("Could not list files in ${dir.path}: $e");
         return <FileSystemEntity>[];
       }
     });
+  }
 
-    // Map files to the ArquivoDeletavel model, identifying old backups.
-    var deletableFiles = allFiles
+  List<ArquivoDeletavel> _mapAndFilterFiles(Iterable<FileSystemEntity> files) {
+    return files
         .map((file) =>
             ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
-        // If 'exibirUltimo' is false, filter out the most recent backup.
         .where(
             (file) => this.exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
         .toList();
+  }
 
-    // Sort files by creation date.
-    deletableFiles.sort((a, b) => a.dataCriacao.compareTo(b.dataCriacao));
+  List<ArquivoDeletavel> _sortFiles(List<ArquivoDeletavel> files) {
+    files.sort((a, b) => a.dataCriacao.compareTo(b.dataCriacao));
+    return this.inverter ? files.reversed.toList() : files;
+  }
 
-    // Reverse the list if specified and return.
-    return this.inverter ? deletableFiles.reversed.toList() : deletableFiles;
+  Future<List<ArquivoDeletavel>> getArquivos() async {
+    final pastas = await _pastas;
+    final existingDirectories =
+        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
+
+    final allFiles = _getAllFiles(existingDirectories);
+    final deletableFiles = _mapAndFilterFiles(allFiles);
+    final sortedFiles = _sortFiles(deletableFiles);
+
+    return sortedFiles;
   }
 }
