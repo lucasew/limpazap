@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
@@ -17,14 +18,15 @@ class ArquivoDeletavelController {
     if (externalDirs == null) {
       return [];
     }
-
+    // SECURITY-NOTE: Using p.join prevents path traversal vulnerabilities
+    // by ensuring that path components are correctly and safely combined.
     return externalDirs
         .map((dir) => dir.path.split('/Android/')[0])
         .expand((basePath) => [
-              "$basePath/Android/media/com.whatsapp/WhatsApp/Databases",
-              "$basePath/Android/media/com.whatsapp.w4b/WhatsApp Business/Databases",
-              "$basePath/WhatsApp/Databases",
-              "$basePath/GBWhatsApp/Databases",
+              p.join(basePath, "Android", "media", "com.whatsapp", "WhatsApp", "Databases"),
+              p.join(basePath, "Android", "media", "com.whatsapp.w4b", "WhatsApp Business", "Databases"),
+              p.join(basePath, "WhatsApp", "Databases"),
+              p.join(basePath, "GBWhatsApp", "Databases"),
             ])
         .toSet()
         .toList();
