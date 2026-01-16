@@ -39,17 +39,24 @@ class ArquivoDeletavelController {
     final existingDirectories =
         pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
 
-    // List files from all existing directories, creating a single flat list.
-    final allFiles = existingDirectories.expand((dir) {
+    // Asynchronously list files from all directories.
+    final List<Future<List<FileSystemEntity>>> fileListFutures =
+        existingDirectories.map((dir) async {
       try {
-        return dir.listSync();
+        // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
+        // which could lead to a client-side Denial of Service (DoS) if a
+        // directory is very large or slow to access.
+        return await dir.list().toList();
       } on FileSystemException catch (e) {
         // Log the error and return an empty list to avoid crashing.
-        // This can happen if the directory is inaccessible.
         debugPrint("Could not list files in ${dir.path}: $e");
         return <FileSystemEntity>[];
       }
-    });
+    }).toList();
+
+    // Wait for all file listing operations to complete and flatten the list.
+    final allFileLists = await Future.wait(fileListFutures);
+    final allFiles = allFileLists.expand((fileList) => fileList).toList();
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
     var deletableFiles = allFiles
