@@ -32,10 +32,6 @@ class ArquivosViewState extends State<ArquivosView> {
     });
   }
 
-  void update() {
-    loadArquivos();
-  }
-
   void listen() {
     final dbAntigo = RegExp("msgstore-");
     chan.stream.listen((ad) async {
@@ -50,8 +46,14 @@ class ArquivosViewState extends State<ArquivosView> {
           debugPrint("Failed to delete ${ad.arquivo.path}: $e");
         }
       }
-      update();
+
+      loadArquivos();
     });
+  }
+
+  void _toggleState(void Function() stateChange) {
+    setState(stateChange);
+    loadArquivos();
   }
 
   @override
@@ -63,25 +65,15 @@ class ArquivosViewState extends State<ArquivosView> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: update,
+            onPressed: loadArquivos,
           ),
           IconButton(
             icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
-            onPressed: () {
-              setState(() {
-                inverter = !inverter;
-              });
-              update();
-            },
+            onPressed: () => _toggleState(() => inverter = !inverter),
           ),
           IconButton(
             icon: Icon(exibirUltimo ? Icons.visibility_off : Icons.visibility),
-            onPressed: () {
-              setState(() {
-                exibirUltimo = !exibirUltimo;
-              });
-              update();
-            },
+            onPressed: () => _toggleState(() => exibirUltimo = !exibirUltimo),
           ),
         ],
       ),
