@@ -6,6 +6,8 @@ This file lists patterns of changes that have been consistently rejected by huma
 
 ## IGNORE: Adding Confirmation Dialogs for Deletion
 
-**- Pattern:** Do not add a confirmation dialog (e.g., `AlertDialog`) before performing a file deletion or other destructive action.
-**- Justification:** This change was proposed in PR #69 and rejected. The project prioritizes a streamlined and fast user experience, and mandatory confirmation steps are considered disruptive to the user flow. Changes that add friction to core actions will be rejected.
-**- Files Affected:** `lib/view/arquivo_deletavel_view.dart`
+**- Pattern:** Do not add confirmation dialogs or other user interruptions before file deletion actions.
+**- Justification:** Pull request #69, which added a confirmation dialog before deletions, was rejected. This indicates a design preference for a streamlined, uninterrupted user flow. While confirmation dialogs can prevent accidental deletions, they are considered an anti-pattern in the context of this specific application.
+**- Files Affected:** `lib/view/ArquivosView.dart`
+
+---
