@@ -33,8 +33,20 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void listen() {
+    final dbAntigo = RegExp("msgstore-");
     chan.stream.listen((ad) async {
-      await ad.arquivo.delete();
+      // SECURITY-NOTE: Re-verify the file path and existence before deleting
+      // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
+      // This ensures we only delete expected backup files.
+      if (dbAntigo.hasMatch(ad.arquivo.path) && await ad.arquivo.exists()) {
+        try {
+          await ad.arquivo.delete();
+        } on FileSystemException catch (e) {
+          // Log if deletion fails for any reason (e.g., permissions).
+          debugPrint("Failed to delete ${ad.arquivo.path}: $e");
+        }
+      }
+
       loadArquivos();
     });
   }
