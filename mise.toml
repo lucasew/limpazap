@@ -1,14 +1,14 @@
 [tools]
 android-sdk = "19.0"
-flutter = "3.22.2"
+flutter = "3.22.2-stable"
 java = "22.0.0"
-usage = "latest"
-yq = "latest"
-shfmt = "latest"
-shellcheck = "latest"
-actionlint = "latest"
-dprint = "latest"
-"npm:prettier" = "latest"
+usage = "2.12.0"
+yq = "4.50.1"
+shfmt = "3.12.0"
+shellcheck = "0.11.0"
+actionlint = "1.7.10"
+dprint = "0.51.1"
+"npm:prettier" = "3.8.0"
 
 [tasks.setup-androidsdk]
 run = "yes | sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
