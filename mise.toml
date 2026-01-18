@@ -1,9 +1,54 @@
 [tools]
 android-sdk = "19.0"
-flutter = "3.35.7-stable"
+flutter = "3.22.2"
 java = "22.0.0"
 usage = "latest"
 yq = "latest"
+shfmt = "latest"
+shellcheck = "latest"
+actionlint = "latest"
+dprint = "latest"
+"npm:prettier" = "latest"
 
 [tasks.setup-androidsdk]
 run = "yes | sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
+
+[tasks."fmt:dart"]
+run = "dart format ."
+description = "Format Dart files"
+
+[tasks."fmt:sh"]
+run = "shfmt -w create_backup"
+description = "Format Bash scripts"
+
+[tasks."fmt:md"]
+run = "dprint fmt"
+description = "Format Markdown files"
+
+[tasks."fmt:yaml"]
+run = "prettier --write \"**/*.yaml\""
+description = "Format YAML files"
+
+[tasks.fmt]
+depends = ["fmt:*"]
+description = "Format all files"
+
+[tasks."lint:dart"]
+run = "flutter analyze"
+description = "Lint Dart files"
+
+[tasks."lint:sh"]
+run = "shellcheck create_backup"
+description = "Lint Bash scripts"
+
+[tasks."lint:action"]
+run = "actionlint"
+description = "Lint GitHub Actions"
+
+[tasks.lint]
+depends = ["lint:*"]
+description = "Lint all files"
+
+[tasks.ci]
+depends = ["lint"]
+description = "CI pipeline"
