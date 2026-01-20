@@ -13,3 +13,9 @@ This journal is for recording CRITICAL security learnings only.
 **Vulnerability:** A Time-of-check to Time-of-use (TOCTOU) race condition existed in the file deletion process. The application would identify a list of backup files to be deleted, but it would not re-verify the file's identity immediately before the delete operation. This created a small window where a malicious actor could potentially swap a legitimate backup file with a different, more sensitive file, leading to unintentional data destruction.
 **Learning:** The state of a file on the filesystem can change between the time it's checked and the time it's used. For security-critical operations like file deletion, it is crucial to minimize this window and re-validate the resource to ensure the operation is performed on the intended target.
 **Prevention:** Before performing a destructive file operation, always re-verify the file's identity and state (e.g., by checking its name and existence) immediately before the operation executes. This ensures that the file being acted upon is the same one that was originally validated.
+
+## 2026-01-20 - Prevent UI Blocking During File Analysis
+
+**Vulnerability:** The application was using synchronous file I/O (`statSync`) within the `ArquivoDeletavel` model constructor. When processing a large number of backup files, this synchronous operation on the main thread would cause the UI to freeze (Unresponsive App / DoS risk).
+**Learning:** Performing synchronous I/O operations on the main thread is a common cause of "Application Not Responding" (ANR) errors. Even small operations add up when iterating over lists.
+**Prevention:** Avoid synchronous I/O (like `statSync`, `readSync`) in data models, especially those instantiated in loops. Use asynchronous factory methods (e.g., `static Future<Model> load`) and `Future.wait` to process multiple items concurrently without blocking the event loop.
