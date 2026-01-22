@@ -5,8 +5,6 @@ import 'package:path/path.dart' as p;
 import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
-  // The name of old backups matches this regex.
-  final dbAntigo = RegExp("msgstore-");
   bool inverter;
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
@@ -58,13 +56,18 @@ class ArquivoDeletavelController {
     final allFileLists = await Future.wait(fileListFutures);
     final allFiles = allFileLists.expand((fileList) => fileList).toList();
 
-    // Map files to the ArquivoDeletavel model, identifying old backups.
-    var deletableFiles = allFiles
-        .map((file) =>
-            ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
+    // Map files to the ArquivoDeletavel model asynchronously, identifying old backups.
+    var deletableFilesFutures = allFiles.map((file) => ArquivoDeletavel.load(
+        file,
+        isUltimo: !ArquivoDeletavel.regexBackup.hasMatch(file.path)));
+
+    var loadedFiles = await Future.wait(deletableFilesFutures);
+
+    var deletableFiles = loadedFiles
         // If 'exibirUltimo' is false, filter out the most recent backup.
-        .where(
-            (file) => this.exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
+        .where((file) =>
+            this.exibirUltimo ||
+            ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path))
         .toList();
 
     // Sort files by creation date.
