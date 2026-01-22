@@ -8,7 +8,7 @@ shfmt = "3.12.0"
 shellcheck = "0.11.0"
 actionlint = "1.7.10"
 dprint = "0.51.1"
-"npm:prettier" = "3.8.0"
+"npm:prettier" = "3.8.1"
 
 [tasks.setup-androidsdk]
 run = "yes | sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
