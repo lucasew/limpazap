@@ -8,8 +8,9 @@ class ArquivoDeletavel {
 
   ArquivoDeletavel._(this.arquivo, this.dataCriacao, this.tamanho, this.isUltimo);
 
-  factory ArquivoDeletavel(FileSystemEntity arquivo, {bool isUltimo = false}) {
-    final stat = arquivo.statSync();
+  static Future<ArquivoDeletavel> load(FileSystemEntity arquivo,
+      {bool isUltimo = false}) async {
+    final stat = await arquivo.stat();
     return ArquivoDeletavel._(
       arquivo,
       stat.modified,
