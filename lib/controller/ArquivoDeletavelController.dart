@@ -6,7 +6,7 @@ import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
   // The name of old backups matches this regex.
-  final dbAntigo = RegExp("msgstore-");
+  final dbAntigo = RegExp('msgstore-');
   bool inverter;
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
@@ -23,10 +23,10 @@ class ArquivoDeletavelController {
     return externalDirs
         .map((dir) => dir.path.split('/Android/')[0])
         .expand((basePath) => [
-              p.join(basePath, "Android", "media", "com.whatsapp", "WhatsApp", "Databases"),
-              p.join(basePath, "Android", "media", "com.whatsapp.w4b", "WhatsApp Business", "Databases"),
-              p.join(basePath, "WhatsApp", "Databases"),
-              p.join(basePath, "GBWhatsApp", "Databases"),
+              p.join(basePath, 'Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'),
+              p.join(basePath, 'Android', 'media', 'com.whatsapp.w4b', 'WhatsApp Business', 'Databases'),
+              p.join(basePath, 'WhatsApp', 'Databases'),
+              p.join(basePath, 'GBWhatsApp', 'Databases'),
             ])
         .toSet()
         .toList();
@@ -49,7 +49,7 @@ class ArquivoDeletavelController {
         return await dir.list().toList();
       } on FileSystemException catch (e) {
         // Log the error and return an empty list to avoid crashing.
-        debugPrint("Could not list files in ${dir.path}: $e");
+        debugPrint('Could not list files in ${dir.path}: $e');
         return <FileSystemEntity>[];
       }
     }).toList();
@@ -72,5 +72,25 @@ class ArquivoDeletavelController {
 
     // Reverse the list if specified and return.
     return this.inverter ? deletableFiles.reversed.toList() : deletableFiles;
+  }
+
+  Future<void> deleteFile(ArquivoDeletavel file) async {
+    // SECURITY-NOTE: Re-verify the file path and existence before deleting
+    // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
+    // This ensures we only delete expected backup files.
+    if (dbAntigo.hasMatch(file.arquivo.path) && await file.arquivo.exists()) {
+      try {
+        await file.arquivo.delete();
+      } on FileSystemException catch (e) {
+        // Log if deletion fails for any reason (e.g., permissions).
+        debugPrint('Failed to delete ${file.arquivo.path}: $e');
+      }
+    }
+  }
+
+  Future<void> deleteFiles(List<ArquivoDeletavel> files) async {
+    for (var file in files) {
+      await deleteFile(file);
+    }
   }
 }
