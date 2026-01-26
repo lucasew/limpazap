@@ -13,3 +13,9 @@ This journal is for recording CRITICAL security learnings only.
 **Vulnerability:** A Time-of-check to Time-of-use (TOCTOU) race condition existed in the file deletion process. The application would identify a list of backup files to be deleted, but it would not re-verify the file's identity immediately before the delete operation. This created a small window where a malicious actor could potentially swap a legitimate backup file with a different, more sensitive file, leading to unintentional data destruction.
 **Learning:** The state of a file on the filesystem can change between the time it's checked and the time it's used. For security-critical operations like file deletion, it is crucial to minimize this window and re-validate the resource to ensure the operation is performed on the intended target.
 **Prevention:** Before performing a destructive file operation, always re-verify the file's identity and state (e.g., by checking its name and existence) immediately before the operation executes. This ensures that the file being acted upon is the same one that was originally validated.
+
+## 2026-01-19 - Client-Side Denial of Service via Blocking I/O
+
+**Vulnerability:** The application was using synchronous file operations (`statSync`, `existsSync`) on the main UI thread when scanning for backup files. On devices with a large number of files or slow storage, this could cause the application to freeze (Application Not Responding - ANR), leading to a Denial of Service (DoS).
+**Learning:** Performing blocking I/O operations on the main thread significantly degrades user experience and availability, especially when dealing with external storage or large datasets.
+**Prevention:** Always use asynchronous file operations (`await file.stat()`, `await file.exists()`) and run them in parallel (e.g., `Future.wait`) or in a background isolate to prevent blocking the UI thread.

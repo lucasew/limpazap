@@ -35,9 +35,20 @@ class ArquivoDeletavelController {
   Future<List<ArquivoDeletavel>> getArquivos() async {
     final pastas = await _pastas;
 
-    // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories =
-        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
+    // Convert paths to Directory objects.
+    final directoryObjects = pastas.map((path) => Directory(path)).toList();
+
+    // Asynchronously check for existence.
+    final directoryExistenceFutures = directoryObjects.map((dir) => dir.exists());
+    final directoryExistenceResults = await Future.wait(directoryExistenceFutures);
+
+    // Filter out non-existent directories.
+    final existingDirectories = <Directory>[];
+    for (int i = 0; i < directoryObjects.length; i++) {
+      if (directoryExistenceResults[i]) {
+        existingDirectories.add(directoryObjects[i]);
+      }
+    }
 
     // Asynchronously list files from all directories.
     final List<Future<List<FileSystemEntity>>> fileListFutures =
@@ -59,9 +70,15 @@ class ArquivoDeletavelController {
     final allFiles = allFileLists.expand((fileList) => fileList).toList();
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
-    var deletableFiles = allFiles
-        .map((file) =>
-            ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
+    // SECURITY-NOTE: Async creation prevents blocking the UI thread (DoS)
+    // when getting stats for many files.
+    var deletableFileFutures = allFiles.map((file) => ArquivoDeletavel.create(
+        file,
+        isUltimo: !dbAntigo.hasMatch(file.path)));
+
+    var deletableFilesRaw = await Future.wait(deletableFileFutures);
+
+    var deletableFiles = deletableFilesRaw
         // If 'exibirUltimo' is false, filter out the most recent backup.
         .where(
             (file) => exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
