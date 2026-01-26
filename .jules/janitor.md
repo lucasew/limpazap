@@ -18,3 +18,10 @@ This journal is for recording CRITICAL, non-routine refactoring learnings only.
 **Root Cause:** The original implementation likely prioritized simplicity but did not account for the performance implications of synchronous file operations on mobile devices where the UI thread is critical for a smooth experience.
 **Solution:** I refactored the file discovery logic to be fully asynchronous. The `listSync()` call was replaced with `dir.list().toList()`, and `Future.wait()` was used to process multiple directories concurrently. This ensures that the UI thread remains unblocked during file scanning.
 **Pattern:** Always prefer asynchronous I/O operations (e.g., `list()`, `readAsString()`) over their synchronous counterparts (`listSync()`, `readAsStringSync()`) in Flutter applications, especially for any operation that might run on the UI thread. Use `Future.wait` to efficiently parallelize multiple asynchronous tasks.
+
+## 2026-01-19 - Async Model Initialization
+
+**Issue:** `ArquivoDeletavel` used a synchronous factory constructor that called `statSync()`. This caused the main thread to block for every file found during the scanning process, potentially leading to UI jank or freezing when many files are present.
+**Root Cause:** The convenience of a factory constructor led to using synchronous I/O, as constructors cannot be asynchronous.
+**Solution:** I replaced the factory constructor with a static async method `load()`, which uses `await arquivo.stat()`. I then updated `ArquivoDeletavelController` to use `Future.wait` to process these async calls concurrently.
+**Pattern:** Avoid synchronous I/O (`statSync`, `readSync`) in model constructors. Use static async factory methods (e.g., `static Future<Model> load(...)`) to perform necessary I/O operations without blocking the UI thread.

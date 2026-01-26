@@ -59,9 +59,13 @@ class ArquivoDeletavelController {
     final allFiles = allFileLists.expand((fileList) => fileList).toList();
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
-    var deletableFiles = allFiles
-        .map((file) =>
-            ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
+    // SECURITY-NOTE: Use async loading to prevent blocking the UI thread with statSync calls.
+    final futures = allFiles.map((file) =>
+        ArquivoDeletavel.load(file, isUltimo: !dbAntigo.hasMatch(file.path)));
+
+    final loadedFiles = await Future.wait(futures);
+
+    var deletableFiles = loadedFiles
         // If 'exibirUltimo' is false, filter out the most recent backup.
         .where(
             (file) => exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
