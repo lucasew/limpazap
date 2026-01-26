@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
-import 'dart:async';
-
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
-  final StreamController<ArquivoDeletavel> chan;
-  ArquivoWidget(this.arquivo, this.chan);
+  final Function(ArquivoDeletavel) onDelete;
+  const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
 
   String get _textoDataCriacao {
     var d = arquivo.dataCriacao;
-    return "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}";
+    return '${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
   }
 
   String get _textoTamanho {
-    return "${(arquivo.tamanho / 1000000).round()} MB";
+    return '${(arquivo.tamanho / 1000000).round()} MB';
   }
 
   Widget _buildTitle() {
@@ -71,7 +69,7 @@ class ArquivoWidget extends StatelessWidget {
         background: _buildDismissBackground(alignment: Alignment.centerLeft),
         secondaryBackground: _buildDismissBackground(alignment: Alignment.centerRight),
         onDismissed: (_) {
-          chan.add(arquivo);
+          onDelete(arquivo);
         },
       ),
     );

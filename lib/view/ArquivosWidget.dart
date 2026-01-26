@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
 import './ArquivoWidget.dart';
-import 'dart:async';
 
 class ArquivosWidget extends StatelessWidget {
-  late List<ArquivoDeletavel> arquivos;
-  late List<ArquivoWidget> widgets;
-  late StreamController<ArquivoDeletavel> chan;
-  ArquivosWidget(this.arquivos, this.chan) {
-    this.widgets = arquivos.map((a) => ArquivoWidget(a, chan)).toList();
-  }
+  final List<ArquivoDeletavel> arquivos;
+  final Function(ArquivoDeletavel) onDelete;
+
+  const ArquivosWidget(this.arquivos, this.onDelete, {super.key});
+
+  @override
   Widget build(BuildContext ctx) {
+    final widgets = arquivos.map((a) => ArquivoWidget(a, onDelete)).toList();
     return ListView(children: widgets);
   }
 }
