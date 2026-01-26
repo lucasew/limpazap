@@ -18,3 +18,10 @@ This journal is for recording CRITICAL, non-routine refactoring learnings only.
 **Root Cause:** The original implementation likely prioritized simplicity but did not account for the performance implications of synchronous file operations on mobile devices where the UI thread is critical for a smooth experience.
 **Solution:** I refactored the file discovery logic to be fully asynchronous. The `listSync()` call was replaced with `dir.list().toList()`, and `Future.wait()` was used to process multiple directories concurrently. This ensures that the UI thread remains unblocked during file scanning.
 **Pattern:** Always prefer asynchronous I/O operations (e.g., `list()`, `readAsString()`) over their synchronous counterparts (`listSync()`, `readAsStringSync()`) in Flutter applications, especially for any operation that might run on the UI thread. Use `Future.wait` to efficiently parallelize multiple asynchronous tasks.
+
+## 2026-01-18 - Non-blocking Model Instantiation
+
+**Issue:** The `ArquivoDeletavel` constructor used `statSync()`, causing the main thread (or the isolate executing the controller) to block for each file found. This defeats the purpose of asynchronous file listing and can lead to UI jank when processing many files.
+**Root Cause:** Constructors in Dart are synchronous by design. To initialize a model with data fetched asynchronously (like file stats), a standard constructor forces synchronous I/O.
+**Solution:** I introduced a static asynchronous factory method `ArquivoDeletavel.load` that awaits `file.stat()` and then calls a private constructor. I updated the controller to use `Future.wait` to process these asynchronous creations in parallel.
+**Pattern:** To initialize data models with asynchronous data (e.g., file metadata, DB results) without blocking, use a private constructor combined with a `static Future<T> load(...)` factory method. Avoid `statSync`, `readSync`, etc., in constructors of models used in lists.
