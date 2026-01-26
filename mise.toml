@@ -49,6 +49,14 @@ description = "Lint GitHub Actions"
 depends = ["lint:*"]
 description = "Lint all files"
 
+[tasks.install]
+run = "flutter pub get"
+description = "Install dependencies"
+
+[tasks.test]
+run = "flutter test"
+description = "Run tests"
+
 [tasks.ci]
-depends = ["lint"]
+depends = ["lint", "test"]
 description = "CI pipeline"
