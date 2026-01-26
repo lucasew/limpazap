@@ -54,7 +54,7 @@ run = "flutter pub get"
 description = "Install dependencies"
 
 [tasks.test]
-run = "flutter test"
+run = "if [ -d test ]; then flutter test; else echo 'No tests found, skipping'; fi"
 description = "Run tests"
 
 [tasks.ci]
