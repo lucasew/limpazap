@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
 import '../controller/ArquivoDeletavelController.dart';
@@ -6,6 +7,9 @@ import './ArquivosWidget.dart';
 import './SemArquivosWidget.dart';
 
 class ArquivosView extends StatefulWidget {
+  const ArquivosView({super.key});
+
+  @override
   createState() => ArquivosViewState();
 }
 
@@ -33,7 +37,7 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void listen() {
-    final dbAntigo = RegExp("msgstore-");
+    final dbAntigo = RegExp('msgstore-');
     chan.stream.listen((ad) async {
       // SECURITY-NOTE: Re-verify the file path and existence before deleting
       // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
@@ -43,7 +47,7 @@ class ArquivosViewState extends State<ArquivosView> {
           await ad.arquivo.delete();
         } on FileSystemException catch (e) {
           // Log if deletion fails for any reason (e.g., permissions).
-          debugPrint("Failed to delete ${ad.arquivo.path}: $e");
+          debugPrint('Failed to delete ${ad.arquivo.path}: $e');
         }
       }
 
@@ -60,7 +64,7 @@ class ArquivosViewState extends State<ArquivosView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Limpazap", overflow: TextOverflow.visible),
+        title: const Text('Limpazap', overflow: TextOverflow.visible),
         backgroundColor: Colors.green,
         actions: <Widget>[
           IconButton(
@@ -83,7 +87,7 @@ class ArquivosViewState extends State<ArquivosView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Erro: ${snapshot.error}"));
+            return Center(child: Text('Erro: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return SemArquivosWidget();
           } else {

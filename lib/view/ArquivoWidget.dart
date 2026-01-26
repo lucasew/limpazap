@@ -5,7 +5,7 @@ import 'dart:async';
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
   final StreamController<ArquivoDeletavel> chan;
-  ArquivoWidget(this.arquivo, this.chan);
+  const ArquivoWidget(this.arquivo, this.chan, {super.key});
 
   String get _textoDataCriacao {
     var d = arquivo.dataCriacao;
@@ -13,7 +13,7 @@ class ArquivoWidget extends StatelessWidget {
   }
 
   String get _textoTamanho {
-    return "${(arquivo.tamanho / 1000000).round()} MB";
+    return '${(arquivo.tamanho / 1000000).round()} MB';
   }
 
   Widget _buildTitle() {
@@ -57,8 +57,8 @@ class ArquivoWidget extends StatelessWidget {
     return Container(
       alignment: alignment,
       color: Colors.red,
-      child: const Icon(Icons.delete, size: 36),
       padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: const Icon(Icons.delete, size: 36),
     );
   }
 
@@ -67,12 +67,12 @@ class ArquivoWidget extends StatelessWidget {
     return Center(
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
-        child: Center(child: _buildListTile()),
         background: _buildDismissBackground(alignment: Alignment.centerLeft),
         secondaryBackground: _buildDismissBackground(alignment: Alignment.centerRight),
         onDismissed: (_) {
           chan.add(arquivo);
         },
+        child: Center(child: _buildListTile()),
       ),
     );
   }

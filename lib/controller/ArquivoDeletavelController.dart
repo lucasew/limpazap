@@ -6,7 +6,7 @@ import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoDeletavelController {
   // The name of old backups matches this regex.
-  final dbAntigo = RegExp("msgstore-");
+  final dbAntigo = RegExp('msgstore-');
   bool inverter;
   bool exibirUltimo;
   ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
@@ -23,10 +23,10 @@ class ArquivoDeletavelController {
     return externalDirs
         .map((dir) => dir.path.split('/Android/')[0])
         .expand((basePath) => [
-              p.join(basePath, "Android", "media", "com.whatsapp", "WhatsApp", "Databases"),
-              p.join(basePath, "Android", "media", "com.whatsapp.w4b", "WhatsApp Business", "Databases"),
-              p.join(basePath, "WhatsApp", "Databases"),
-              p.join(basePath, "GBWhatsApp", "Databases"),
+              p.join(basePath, 'Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'),
+              p.join(basePath, 'Android', 'media', 'com.whatsapp.w4b', 'WhatsApp Business', 'Databases'),
+              p.join(basePath, 'WhatsApp', 'Databases'),
+              p.join(basePath, 'GBWhatsApp', 'Databases'),
             ])
         .toSet()
         .toList();
@@ -49,7 +49,7 @@ class ArquivoDeletavelController {
         return await dir.list().toList();
       } on FileSystemException catch (e) {
         // Log the error and return an empty list to avoid crashing.
-        debugPrint("Could not list files in ${dir.path}: $e");
+        debugPrint('Could not list files in ${dir.path}: $e');
         return <FileSystemEntity>[];
       }
     }).toList();
@@ -64,13 +64,13 @@ class ArquivoDeletavelController {
             ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
         // If 'exibirUltimo' is false, filter out the most recent backup.
         .where(
-            (file) => this.exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
+            (file) => exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
         .toList();
 
     // Sort files by creation date.
     deletableFiles.sort((a, b) => a.dataCriacao.compareTo(b.dataCriacao));
 
     // Reverse the list if specified and return.
-    return this.inverter ? deletableFiles.reversed.toList() : deletableFiles;
+    return inverter ? deletableFiles.reversed.toList() : deletableFiles;
   }
 }
