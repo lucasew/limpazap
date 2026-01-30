@@ -1,6 +1,6 @@
 [tools]
 android-sdk = "19.0"
-flutter = "3.22.2-stable"
+flutter = "3.24.3-stable"
 java = "22.0.0"
 usage = "2.12.0"
 yq = "4.50.1"
@@ -12,6 +12,10 @@ dprint = "0.51.1"
 
 [tasks.setup-androidsdk]
 run = "yes | sdkmanager \"platforms;android-29\" \"build-tools;29.0.3\" \"platform-tools\" && yes | flutter doctor --android-licenses"
+
+[tasks.codegen]
+run = "flutter pub run flutter_launcher_icons"
+description = "Generate code (icons)"
 
 [tasks."fmt:dart"]
 run = "dart format ."
