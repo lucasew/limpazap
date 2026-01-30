@@ -1,5 +1,5 @@
 [tools]
-android-sdk = "19.0"
+android-sdk = "13.0"
 flutter = "3.24.3-stable"
 java = "17"
 usage = "2.12.0"
@@ -11,7 +11,7 @@ dprint = "0.51.1"
 "npm:prettier" = "3.8.0"
 
 [tasks.setup-androidsdk]
-run = "yes | sdkmanager \"platforms;android-34\" \"build-tools;34.0.0\" \"platform-tools\" && yes | flutter doctor --android-licenses"
+run = "yes | sdkmanager --licenses && sdkmanager \"platforms;android-34\" \"build-tools;34.0.0\" \"platform-tools\" && yes | flutter doctor --android-licenses"
 
 [tasks.codegen]
 run = "flutter pub run flutter_launcher_icons"
