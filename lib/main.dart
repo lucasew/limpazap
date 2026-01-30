@@ -35,7 +35,7 @@ void main() async {
     }
     await checarPermissao();
     runApp(
-            MaterialApp(home: ArquivosView())
+            const MaterialApp(home: ArquivosView())
     );
 }
 

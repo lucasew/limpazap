@@ -89,7 +89,7 @@ class ArquivosViewState extends State<ArquivosView> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Erro: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return SemArquivosWidget();
+            return const SemArquivosWidget();
           } else {
             final arquivos = snapshot.data!;
             return ArquivosWidget(arquivos, chan);

@@ -9,7 +9,7 @@ class ArquivosWidget extends StatelessWidget {
   const ArquivosWidget(this.arquivos, this.chan, {super.key});
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     final widgets = arquivos.map((a) => ArquivoWidget(a, chan)).toList();
     return ListView(children: widgets);
   }

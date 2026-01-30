@@ -25,6 +25,9 @@ jobs:
       - name: Install
         run: mise run install
 
+      - name: Setup Android SDK
+        run: mise run setup-androidsdk
+
       - name: Codegen
         run: mise run codegen
 

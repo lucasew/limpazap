@@ -63,7 +63,7 @@ class ArquivoWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Center(
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
