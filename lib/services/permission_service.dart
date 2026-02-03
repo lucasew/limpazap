@@ -2,6 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
+  /// Requests necessary storage permissions for the application.
+  ///
+  /// This handles:
+  /// - `manageExternalStorage` for Android 11+
+  /// - `storage` for older Android versions
+  /// - Redirecting to settings if permissions are permanently denied.
   Future<void> requestPermissions() async {
     // Request `manageExternalStorage` first for modern Android versions.
     if (!await Permission.manageExternalStorage.status.isGranted) {
