@@ -24,6 +24,7 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void loadArquivos() {
+    if (!mounted) return;
     setState(() {
       arquivosFuture = ArquivoDeletavelController(
         inverter: inverter,
@@ -32,7 +33,7 @@ class ArquivosViewState extends State<ArquivosView> {
     });
   }
 
-  Future<void> _handleDelete(ArquivoDeletavel ad) async {
+  Future<void> _deleteFile(ArquivoDeletavel ad) async {
     final dbAntigo = RegExp('msgstore-');
     // SECURITY-NOTE: Re-verify the file path and existence before deleting
     // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
@@ -45,8 +46,24 @@ class ArquivosViewState extends State<ArquivosView> {
         debugPrint('Failed to delete ${ad.arquivo.path}: $e');
       }
     }
+  }
 
-    loadArquivos();
+  Future<void> _onDelete(ArquivoDeletavel ad) async {
+    await _deleteFile(ad);
+    if (mounted) {
+      loadArquivos();
+    }
+  }
+
+  Future<void> _deleteAll() async {
+    final arquivos = await arquivosFuture;
+    if (arquivos != null && arquivos.isNotEmpty) {
+      // Execute all deletions in parallel and wait for them to complete.
+      await Future.wait(arquivos.map((arq) => _deleteFile(arq)));
+      if (mounted) {
+        loadArquivos();
+      }
+    }
   }
 
   void _toggleState(void Function() stateChange) {
@@ -83,21 +100,14 @@ class ArquivosViewState extends State<ArquivosView> {
             return SemArquivosWidget();
           } else {
             final arquivos = snapshot.data!;
-            return ArquivosWidget(arquivos, _handleDelete);
+            return ArquivosWidget(arquivos, _onDelete);
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
+        onPressed: _deleteAll,
         child: const Icon(Icons.delete_sweep),
-        onPressed: () async {
-          final arquivos = await arquivosFuture;
-          if (arquivos != null) {
-            for (var arq in arquivos) {
-              _handleDelete(arq);
-            }
-          }
-        },
       ),
     );
   }
