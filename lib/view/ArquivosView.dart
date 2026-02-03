@@ -13,7 +13,6 @@ class ArquivosView extends StatefulWidget {
   createState() => ArquivosViewState();
 }
 
-
 class ArquivosViewState extends State<ArquivosView> {
   final chan = StreamController<ArquivoDeletavel>();
   Future<List<ArquivoDeletavel>>? arquivosFuture;
@@ -67,10 +66,7 @@ class ArquivosViewState extends State<ArquivosView> {
         title: const Text('Limpazap', overflow: TextOverflow.visible),
         backgroundColor: Colors.green,
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: loadArquivos,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: loadArquivos),
           IconButton(
             icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
             onPressed: () => _toggleState(() => inverter = !inverter),
