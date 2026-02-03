@@ -3,7 +3,7 @@ import '../model/ArquivoDeletavelModel.dart';
 
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
-  final Function(ArquivoDeletavel) onDelete;
+  final Future<void> Function(ArquivoDeletavel) onDelete;
   const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
 
   String get _textoDataCriacao {
@@ -61,8 +61,8 @@ class ArquivoWidget extends StatelessWidget {
         secondaryBackground: _buildDismissBackground(
           alignment: Alignment.centerRight,
         ),
-        onDismissed: (_) {
-          onDelete(arquivo);
+        onDismissed: (_) async {
+          await onDelete(arquivo);
         },
         child: Center(child: _buildListTile()),
       ),

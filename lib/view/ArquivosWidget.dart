@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
-import './ArquivoWidget.dart';
+import 'ArquivoWidget.dart';
 
 class ArquivosWidget extends StatelessWidget {
   final List<ArquivoDeletavel> arquivos;
-  final Function(ArquivoDeletavel) onDelete;
+  final Future<void> Function(ArquivoDeletavel) onDelete;
 
   const ArquivosWidget(this.arquivos, this.onDelete, {super.key});
 
