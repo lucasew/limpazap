@@ -9,7 +9,10 @@ class ArquivoDeletavelController {
   final dbAntigo = RegExp('msgstore-');
   bool inverter;
   bool exibirUltimo;
-  ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
+  ArquivoDeletavelController({
+    this.inverter = false,
+    this.exibirUltimo = false,
+  });
 
   Future<List<String>> get _pastas async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
@@ -22,12 +25,28 @@ class ArquivoDeletavelController {
     // by ensuring that path components are correctly and safely combined.
     return externalDirs
         .map((dir) => dir.path.split('/Android/')[0])
-        .expand((basePath) => [
-              p.join(basePath, 'Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'),
-              p.join(basePath, 'Android', 'media', 'com.whatsapp.w4b', 'WhatsApp Business', 'Databases'),
-              p.join(basePath, 'WhatsApp', 'Databases'),
-              p.join(basePath, 'GBWhatsApp', 'Databases'),
-            ])
+        .expand(
+          (basePath) => [
+            p.join(
+              basePath,
+              'Android',
+              'media',
+              'com.whatsapp',
+              'WhatsApp',
+              'Databases',
+            ),
+            p.join(
+              basePath,
+              'Android',
+              'media',
+              'com.whatsapp.w4b',
+              'WhatsApp Business',
+              'Databases',
+            ),
+            p.join(basePath, 'WhatsApp', 'Databases'),
+            p.join(basePath, 'GBWhatsApp', 'Databases'),
+          ],
+        )
         .toSet()
         .toList();
   }
@@ -36,12 +55,13 @@ class ArquivoDeletavelController {
     final pastas = await _pastas;
 
     // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories =
-        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
+    final existingDirectories = pastas
+        .map((path) => Directory(path))
+        .where((dir) => dir.existsSync());
 
     // Asynchronously list files from all directories.
-    final List<Future<List<FileSystemEntity>>> fileListFutures =
-        existingDirectories.map((dir) async {
+    final List<Future<List<FileSystemEntity>>>
+    fileListFutures = existingDirectories.map((dir) async {
       try {
         // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
         // which could lead to a client-side Denial of Service (DoS) if a
@@ -60,11 +80,12 @@ class ArquivoDeletavelController {
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
     var deletableFiles = allFiles
-        .map((file) =>
-            ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)))
+        .map(
+          (file) =>
+              ArquivoDeletavel(file, isUltimo: !dbAntigo.hasMatch(file.path)),
+        )
         // If 'exibirUltimo' is false, filter out the most recent backup.
-        .where(
-            (file) => exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
+        .where((file) => exibirUltimo || dbAntigo.hasMatch(file.arquivo.path))
         .toList();
 
     // Sort files by creation date.
