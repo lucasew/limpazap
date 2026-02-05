@@ -29,13 +29,10 @@ Future<void> checarPermissao() async {
 }
 
 void main() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    if (!kReleaseMode) {
-        await WakelockPlus.enable();
-    }
-    await checarPermissao();
-    runApp(
-            MaterialApp(home: ArquivosView())
-    );
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kReleaseMode) {
+    await WakelockPlus.enable();
+  }
+  await checarPermissao();
+  runApp(MaterialApp(home: ArquivosView()));
 }
-
