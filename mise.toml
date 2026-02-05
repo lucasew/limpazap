@@ -1,7 +1,7 @@
 [tools]
 android-sdk = "19.0"
 flutter = "3.38.9-stable"
-java = "22.0.0"
+java = "17.0.2"
 usage = "2.12.0"
 yq = "4.50.1"
 shfmt = "3.12.0"
@@ -11,7 +11,7 @@ dprint = "0.51.1"
 "npm:prettier" = "3.8.0"
 
 [tasks.setup-androidsdk]
-run = "yes | sdkmanager \"platforms;android-34\" \"platforms;android-35\" \"build-tools;34.0.0\" \"build-tools;35.0.0\" \"platform-tools\" \"cmdline-tools;latest\" && yes | flutter doctor --android-licenses"
+run = 'yes | sdkmanager "platforms;android-34" "platforms;android-35" "build-tools;34.0.0" "build-tools;35.0.0" "platform-tools" "cmdline-tools;latest" && yes | flutter doctor --android-licenses'
 
 [tasks."fmt:dart"]
 run = "dart format ."
@@ -26,7 +26,7 @@ run = "dprint fmt"
 description = "Format Markdown files"
 
 [tasks."fmt:yaml"]
-run = "prettier --write \"**/*.yaml\""
+run = 'prettier --write "**/*.yaml"'
 description = "Format YAML files"
 
 [tasks.fmt]
