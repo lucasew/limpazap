@@ -1,0 +1,68 @@
+name: autorelease
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autorelease:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Setup Android SDK
+        run: mise run setup-androidsdk
+
+      - name: Install
+        run: mise run install
+
+      - name: Codegen
+        run: mise run codegen
+
+      - name: Check for changes
+        id: git_diff
+        run: |
+          git diff --exit-code || echo "changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR if changes
+        if: steps.git_diff.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "chore: update generated code"
+          body: "Automated changes from codegen."
+          branch: "codegen-update"
+          base: ${{ github.head_ref || github.ref_name }}
+          delete-branch: true
+
+      - name: CI
+        run: mise run ci
+
+      - name: Build Release Artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mise run build:apk
+          mise run build:aab
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            build/app/outputs/flutter-apk/app-release.apk \
+            build/app/outputs/bundle/release/app-release.aab \
+            --generate-notes
