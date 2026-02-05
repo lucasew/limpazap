@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
 class WhatsAppBackupService {
+  /// Scans external storage for WhatsApp backup files.
   Future<List<FileSystemEntity>> getBackupFiles() async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
     // Hardcoding `/sdcard/` is unreliable across Android versions.
