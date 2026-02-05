@@ -5,28 +5,18 @@ class ArquivoDeletavelController {
   final WhatsAppBackupService _service = WhatsAppBackupService();
   bool inverter;
   bool exibirUltimo;
-  ArquivoDeletavelController({
-    this.inverter = false,
-    this.exibirUltimo = false,
-  });
+  ArquivoDeletavelController({this.inverter = false, this.exibirUltimo = false});
 
   Future<List<ArquivoDeletavel>> getArquivos() async {
     final allFiles = await _service.getBackupFiles();
 
     // Map files to the ArquivoDeletavel model, identifying old backups.
-    var deletableFiles = allFiles
-        .map(
-          (file) => ArquivoDeletavel(
-            file,
-            isUltimo: !ArquivoDeletavel.regexBackup.hasMatch(file.path),
-          ),
-        )
+    final deletableFiles = allFiles
+        .map((file) =>
+            ArquivoDeletavel(file, isUltimo: !ArquivoDeletavel.regexBackup.hasMatch(file.path)))
         // If 'exibirUltimo' is false, filter out the most recent backup.
         .where(
-          (file) =>
-              exibirUltimo ||
-              ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path),
-        )
+            (file) => exibirUltimo || ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path))
         .toList();
 
     // Sort files by creation date.
