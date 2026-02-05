@@ -6,7 +6,7 @@ class SemArquivosWidget extends StatelessWidget {
   @override
   Widget build(BuildContext ctx) {
     return Center(
-        child: Icon(Icons.done_sharp, size: 250, color: Colors.green)
+      child: Icon(Icons.done_sharp, size: 250, color: Colors.green),
     );
   }
 }

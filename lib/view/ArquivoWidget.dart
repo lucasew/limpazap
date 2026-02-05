@@ -24,10 +24,7 @@ class ArquivoWidget extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
-            Text(
-              _textoDataCriacao,
-              style: const TextStyle(fontSize: 36),
-            ),
+            Text(_textoDataCriacao, style: const TextStyle(fontSize: 36)),
           ],
         ),
       ),
@@ -38,19 +35,13 @@ class ArquivoWidget extends StatelessWidget {
     return Row(
       children: <Widget>[
         const Icon(Icons.sd_card, size: 36),
-        Text(
-          _textoTamanho,
-          style: const TextStyle(fontSize: 28),
-        ),
+        Text(_textoTamanho, style: const TextStyle(fontSize: 28)),
       ],
     );
   }
 
   Widget _buildListTile() {
-    return ListTile(
-      title: _buildTitle(),
-      subtitle: _buildSubtitle(),
-    );
+    return ListTile(title: _buildTitle(), subtitle: _buildSubtitle());
   }
 
   Widget _buildDismissBackground({required AlignmentGeometry alignment}) {
@@ -68,7 +59,9 @@ class ArquivoWidget extends StatelessWidget {
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
         background: _buildDismissBackground(alignment: Alignment.centerLeft),
-        secondaryBackground: _buildDismissBackground(alignment: Alignment.centerRight),
+        secondaryBackground: _buildDismissBackground(
+          alignment: Alignment.centerRight,
+        ),
         onDismissed: (_) {
           chan.add(arquivo);
         },

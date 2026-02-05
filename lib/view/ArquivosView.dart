@@ -13,7 +13,6 @@ class ArquivosView extends StatefulWidget {
   createState() => ArquivosViewState();
 }
 
-
 class ArquivosViewState extends State<ArquivosView> {
   final chan = StreamController<ArquivoDeletavel>();
   Future<List<ArquivoDeletavel>>? arquivosFuture;
@@ -37,12 +36,12 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void listen() {
-    final dbAntigo = RegExp('msgstore-');
     chan.stream.listen((ad) async {
       // SECURITY-NOTE: Re-verify the file path and existence before deleting
       // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
       // This ensures we only delete expected backup files.
-      if (dbAntigo.hasMatch(ad.arquivo.path) && await ad.arquivo.exists()) {
+      if (ArquivoDeletavel.regexBackup.hasMatch(ad.arquivo.path) &&
+          await ad.arquivo.exists()) {
         try {
           await ad.arquivo.delete();
         } on FileSystemException catch (e) {
@@ -67,10 +66,7 @@ class ArquivosViewState extends State<ArquivosView> {
         title: const Text('Limpazap', overflow: TextOverflow.visible),
         backgroundColor: Colors.green,
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: loadArquivos,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: loadArquivos),
           IconButton(
             icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
             onPressed: () => _toggleState(() => inverter = !inverter),
