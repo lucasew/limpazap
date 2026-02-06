@@ -54,6 +54,7 @@ class ArquivoDeletavelController {
   }
 
   /// Deletes multiple files in parallel using [Future.wait].
+  /// This ensures that all deletion operations are initiated concurrently.
   Future<void> deleteFiles(List<ArquivoDeletavel> files) async {
     await Future.wait(files.map(deleteFile));
   }
