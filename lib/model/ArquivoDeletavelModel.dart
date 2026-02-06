@@ -18,7 +18,10 @@ class ArquivoDeletavel {
   );
 
   /// Asynchronously loads file metadata and creates an ArquivoDeletavel instance.
-  /// This avoids blocking the UI thread with synchronous I/O.
+  ///
+  /// This method uses [FileSystemEntity.stat] to retrieve file information without
+  /// blocking the main isolate, which is crucial for maintaining UI responsiveness
+  /// when processing a large number of backup files.
   static Future<ArquivoDeletavel> load(
     FileSystemEntity arquivo, {
     bool isUltimo = false,
