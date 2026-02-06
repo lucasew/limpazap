@@ -17,8 +17,16 @@ class ArquivoDeletavel {
     this.isUltimo,
   );
 
-  factory ArquivoDeletavel(FileSystemEntity arquivo, {bool isUltimo = false}) {
-    final stat = arquivo.statSync();
+  /// Asynchronously loads file metadata and creates an ArquivoDeletavel instance.
+  ///
+  /// This method uses [FileSystemEntity.stat] to retrieve file information without
+  /// blocking the main isolate, which is crucial for maintaining UI responsiveness
+  /// when processing a large number of backup files.
+  static Future<ArquivoDeletavel> load(
+    FileSystemEntity arquivo, {
+    bool isUltimo = false,
+  }) async {
+    final stat = await arquivo.stat();
     return ArquivoDeletavel._(arquivo, stat.modified, stat.size, isUltimo);
   }
 }
