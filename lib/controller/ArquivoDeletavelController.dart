@@ -40,6 +40,10 @@ class ArquivoDeletavelController {
     return inverter ? deletableFiles.reversed.toList() : deletableFiles;
   }
 
+  /// Deletes a single file with safety checks.
+  ///
+  /// This method performs a TOCTOU check to ensure the file still exists
+  /// and matches the backup regex before attempting deletion.
   Future<void> deleteFile(ArquivoDeletavel file) async {
     // SECURITY-NOTE: Re-verify the file path and existence before deleting
     // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
