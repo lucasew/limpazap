@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
-import 'dart:async';
 
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
-  final StreamController<ArquivoDeletavel> chan;
-  const ArquivoWidget(this.arquivo, this.chan, {super.key});
+  final Function(ArquivoDeletavel) onDelete;
+  const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
 
   String get _textoDataCriacao {
     var d = arquivo.dataCriacao;
@@ -63,7 +62,7 @@ class ArquivoWidget extends StatelessWidget {
           alignment: Alignment.centerRight,
         ),
         onDismissed: (_) {
-          chan.add(arquivo);
+          onDelete(arquivo);
         },
         child: Center(child: _buildListTile()),
       ),

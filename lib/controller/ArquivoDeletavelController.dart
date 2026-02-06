@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
 import '../model/ArquivoDeletavelModel.dart';
 import '../services/WhatsAppBackupService.dart';
 
@@ -34,5 +38,24 @@ class ArquivoDeletavelController {
 
     // Reverse the list if specified and return.
     return inverter ? deletableFiles.reversed.toList() : deletableFiles;
+  }
+
+  Future<void> deleteFile(ArquivoDeletavel file) async {
+    // SECURITY-NOTE: Re-verify the file path and existence before deleting
+    // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
+    // This ensures we only delete expected backup files.
+    if (ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path) &&
+        await file.arquivo.exists()) {
+      try {
+        await file.arquivo.delete();
+      } on FileSystemException catch (e) {
+        // Log if deletion fails for any reason (e.g., permissions).
+        debugPrint('Failed to delete ${file.arquivo.path}: $e');
+      }
+    }
+  }
+
+  Future<void> deleteFiles(List<ArquivoDeletavel> files) async {
+    await Future.wait(files.map((file) => deleteFile(file)));
   }
 }
