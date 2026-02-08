@@ -11,11 +11,11 @@ dprint = "0.51.1"
 "npm:prettier" = "3.8.0"
 
 [tasks."install:androidsdk"]
-run = 'yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" "platform-tools" && yes | flutter doctor --android-licenses'
+run = 'yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" "platform-tools" && flutter config --android-sdk $ANDROID_HOME && yes | flutter doctor --android-licenses'
 description = "Install Android SDK components"
 
 [tasks."install:flutter"]
-run = "flutter pub get"
+run = "flutter config --no-analytics && flutter pub get"
 description = "Install Flutter dependencies"
 
 [tasks.install]

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
+if [ "$#" -lt 1 ]; then
+  echo "Usage: $0 <size_mb>"
+  exit 1
+fi
+
 MB="$1"
 shift
 adb shell mkdir -p /sdcard/WhatsApp/Databases
