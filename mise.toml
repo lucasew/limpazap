@@ -10,8 +10,25 @@ actionlint = "1.7.10"
 dprint = "0.51.1"
 "npm:prettier" = "3.8.0"
 
-[tasks.setup-androidsdk]
+[tasks."install:androidsdk"]
 run = 'yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" "platform-tools" && yes | flutter doctor --android-licenses'
+description = "Install Android SDK components"
+
+[tasks."install:flutter"]
+run = "flutter pub get"
+description = "Install Flutter dependencies"
+
+[tasks.install]
+depends = ["install:*"]
+description = "Install dependencies"
+
+[tasks."codegen:icons"]
+run = "dart run flutter_launcher_icons"
+description = "Generate launcher icons"
+
+[tasks.codegen]
+depends = ["codegen:*"]
+description = "Generate code"
 
 [tasks."fmt:dart"]
 run = "dart format ."
@@ -49,13 +66,21 @@ description = "Lint GitHub Actions"
 depends = ["lint:*"]
 description = "Lint all files"
 
-[tasks.install]
-run = "flutter pub get"
-description = "Install dependencies"
+[tasks."test:flutter"]
+run = "flutter test"
+description = "Run Flutter tests"
 
 [tasks.test]
-run = "flutter test"
+depends = ["test:*"]
 description = "Run tests"
+
+[tasks."build:apk"]
+run = "flutter build apk --release"
+description = "Build Android APK"
+
+[tasks."build:aab"]
+run = "flutter build appbundle --release"
+description = "Build Android App Bundle"
 
 [tasks.ci]
 depends = ["lint", "test"]
