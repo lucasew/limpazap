@@ -15,6 +15,7 @@ run = 'yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" "cmdline-too
 description = "Install Android SDK components"
 
 [tasks."install:flutter"]
+depends = ["install:androidsdk"]
 run = "flutter config --no-analytics && flutter pub get"
 description = "Install Flutter dependencies"
 
