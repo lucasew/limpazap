@@ -8,7 +8,7 @@ class ArquivosWidget extends StatelessWidget {
   const ArquivosWidget(this.arquivos, this.onDelete, {super.key});
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     final widgets = arquivos.map((a) => ArquivoWidget(a, onDelete)).toList();
     return ListView(children: widgets);
   }
