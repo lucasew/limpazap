@@ -22,7 +22,7 @@ void main() {
       await file.create();
 
       final controller = ArquivoDeletavelController();
-      final arquivoDeletavel = ArquivoDeletavel(file);
+      final arquivoDeletavel = await ArquivoDeletavel.load(file);
 
       await controller.deleteFile(arquivoDeletavel);
 
@@ -34,7 +34,7 @@ void main() {
       await file.create();
 
       final controller = ArquivoDeletavelController();
-      final arquivoDeletavel = ArquivoDeletavel(file);
+      final arquivoDeletavel = await ArquivoDeletavel.load(file);
 
       await controller.deleteFile(arquivoDeletavel);
 

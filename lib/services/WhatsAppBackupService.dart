@@ -3,8 +3,31 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
+/// Service responsible for identifying and listing WhatsApp backup files on external storage.
+///
+/// This service handles the complexities of Android file storage, including:
+/// *   Discovering external storage roots (internal storage and SD cards).
+/// *   Constructing paths for various WhatsApp distributions (Standard, Business, GBWhatsApp).
+/// *   Safely listing files without blocking the UI.
 class WhatsAppBackupService {
-  /// Scans external storage for WhatsApp backup files.
+  /// Scans all available external storage volumes for WhatsApp backup directories.
+  ///
+  /// This method performs a comprehensive scan by:
+  /// 1.  Identifying all external storage roots using [getExternalStorageDirectories].
+  /// 2.  Constructing potential backup paths for:
+  ///     *   WhatsApp (com.whatsapp)
+  ///     *   WhatsApp Business (com.whatsapp.w4b)
+  ///     *   Legacy paths (WhatsApp/Databases, GBWhatsApp/Databases)
+  /// 3.  Filtering for directories that actually exist.
+  /// 4.  Asynchronously listing files in each directory to prevent UI jank.
+  ///
+  /// **Security:**
+  /// *   Uses `path_provider` to avoid unreliable hardcoded paths like `/sdcard/`.
+  /// *   Uses [p.join] to prevent path traversal vulnerabilities.
+  /// *   Catches [FileSystemException] during listing to ensure robustness against permission issues or file system errors.
+  ///
+  /// Returns a flattened list of all [FileSystemEntity] objects found in the backup directories.
+  /// Returns an empty list if no external storage is found or if no backups exist.
   Future<List<FileSystemEntity>> getBackupFiles() async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
     // Hardcoding `/sdcard/` is unreliable across Android versions.
