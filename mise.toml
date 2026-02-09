@@ -46,7 +46,7 @@ run = "actionlint"
 description = "Lint GitHub Actions"
 
 [tasks.lint]
-depends = ["lint:*"]
+depends = ["lint:dart", "lint:sh"]
 description = "Lint all files"
 
 [tasks.install]
