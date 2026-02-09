@@ -54,6 +54,7 @@ run = "flutter pub get"
 description = "Install dependencies"
 
 [tasks.test]
+depends = ["install"]
 run = "flutter test"
 description = "Run tests"
 
