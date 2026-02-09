@@ -4,9 +4,9 @@ class SemArquivosWidget extends StatelessWidget {
   const SemArquivosWidget({super.key});
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Center(
-      child: Icon(Icons.done_sharp, size: 250, color: Colors.green),
+      child: const Icon(Icons.done_sharp, size: 250, color: Colors.green),
     );
   }
 }
