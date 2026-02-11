@@ -33,6 +33,22 @@ description = "Install all dependencies"
 depends = ["install:androidsdk"]
 description = "Alias for install:androidsdk"
 
+[tasks."codegen:icons"]
+run = "dart run flutter_launcher_icons"
+description = "Generate app icons"
+
+[tasks.codegen]
+depends = ["codegen:*"]
+description = "Run all codegen tasks"
+
+[tasks."build:apk"]
+run = "flutter build apk --release"
+description = "Build Release APK"
+
+[tasks."build:aab"]
+run = "flutter build appbundle --release"
+description = "Build Release App Bundle"
+
 [tasks."fmt:dart"]
 run = "dart format ."
 description = "Format Dart files"

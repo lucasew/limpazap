@@ -19,11 +19,11 @@ jobs:
       run: echo "branch=${GITHUB_REF#refs/heads/}" >> "$GITHUB_OUTPUT"
       id: extract_branch
       
-    - run: flutter pub get
-    - run: flutter pub run flutter_launcher_icons:main
+    - run: mise run install:flutter
+    - run: mise run codegen:icons
 #    - run: flutter test
-    - run: flutter build apk --release
-    - run: flutter build appbundle --release
+    - run: mise run build:apk
+    - run: mise run build:aab
       
     - name: Create a Release APK
       uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
