@@ -26,7 +26,7 @@ jobs:
     - run: flutter build appbundle --release
       
     - name: Create a Release APK
-      uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
+      uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1
       with:
         artifacts: "build/app/outputs/bundle/release/app-release.aab,build/app/outputs/flutter-apk/app-release.apk"
         name: Compilação automática ${{ github.sha }} para branch ${{ steps.extract_branch.outputs.branch }}
