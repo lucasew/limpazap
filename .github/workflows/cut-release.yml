@@ -1,0 +1,77 @@
+name: Cut Release
+
+# One-click release (trigger via GitHub Actions UI).
+# - Bumps the version in pubspec.yaml (increments the build number)
+# - Commits the change
+# - Creates an annotated vX.Y.Z tag
+# - Pushes the commit + tag
+#
+# This is the only thing you need to do for a new version.
+#
+# Because fdroiddata is configured with AutoUpdateMode + UpdateCheckMode: Tags,
+# F-Droid will automatically discover the new tag, pick up the version,
+# and build the new release from source on their servers (no MR needed).
+#
+# The "release" workflow will also run on the tag and provide
+# APK + AAB as downloadable workflow artifacts (for direct use if desired).
+#
+# No GitHub Releases are created.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New semantic version to release (e.g. 4.2.0). Build number is auto-incremented from pubspec."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version-and-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with token for pushing
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup environment (gives us yq)
+        uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3
+
+      - name: Bump version in pubspec.yaml
+        run: |
+          set -euo pipefail
+
+          NEW_SEMVER="${{ github.event.inputs.version }}"
+          CURRENT=$(yq '.version' pubspec.yaml)
+          CURRENT_BUILD=$(echo "$CURRENT" | sed -n 's/.*+\([0-9]*\)$/\1/p')
+          CURRENT_BUILD=${CURRENT_BUILD:-0}
+          NEW_BUILD=$((CURRENT_BUILD + 1))
+          NEW_VERSION="${NEW_SEMVER}+${NEW_BUILD}"
+
+          yq -i ".version = \"${NEW_VERSION}\"" pubspec.yaml
+
+          echo "Bumped pubspec version to: ${NEW_VERSION}"
+
+      - name: Commit, tag and push
+        run: |
+          set -euo pipefail
+
+          NEW_SEMVER="${{ github.event.inputs.version }}"
+          TAG="v${NEW_SEMVER}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add pubspec.yaml
+          git commit -m "chore(release): ${NEW_SEMVER}"
+
+          git tag -a "${TAG}" -m "Limpazap ${NEW_SEMVER}"
+
+          git push origin HEAD
+          git push origin "${TAG}"
+
+          echo "Created and pushed tag ${TAG}"

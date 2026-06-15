@@ -3,7 +3,12 @@ name: release
 # Builds release APK + AAB.
 # Triggers on pushes to master/main, pull requests, workflow_dispatch, and version tags (v*).
 # The built files are uploaded as workflow artifacts (downloadable from the Actions run).
-# No GitHub Releases are ever created — F-Droid (which builds from source using tags) is the primary distribution path.
+#
+# No GitHub Releases are ever created.
+#
+# For F-Droid: once fdroiddata has AutoUpdateMode + UpdateCheckMode: Tags
+# (which it apparently does for this app), new `vX.Y.Z` tags are automatically
+# picked up. The Cut Release workflow is the only manual step needed.
 on:
   push:
     branches: [master, main]
