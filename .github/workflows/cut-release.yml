@@ -1,22 +1,5 @@
 name: Cut Release
 
-# One-click release (trigger via GitHub Actions UI).
-# - Bumps the version in pubspec.yaml (increments the build number)
-# - Commits the change
-# - Creates an annotated vX.Y.Z tag
-# - Pushes the commit + tag
-#
-# This is the only thing you need to do for a new version.
-#
-# Because fdroiddata is configured with AutoUpdateMode + UpdateCheckMode: Tags,
-# F-Droid will automatically discover the new tag, pick up the version,
-# and build the new release from source on their servers (no MR needed).
-#
-# The "release" workflow will also run on the tag and provide
-# APK + AAB as downloadable workflow artifacts (for direct use if desired).
-#
-# No GitHub Releases are created.
-
 on:
   workflow_dispatch:
     inputs:

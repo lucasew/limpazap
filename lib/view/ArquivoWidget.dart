@@ -8,7 +8,7 @@ class ArquivoWidget extends StatelessWidget {
 
   String get _textoDataCriacao {
     var d = arquivo.dataCriacao;
-    return "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}";
+    return '${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
   }
 
   String get _textoTamanho {
