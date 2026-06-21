@@ -8,13 +8,12 @@ class ArquivosView extends StatefulWidget {
   const ArquivosView({super.key});
 
   @override
-  createState() => ArquivosViewState();
+  State<ArquivosView> createState() => ArquivosViewState();
 }
 
 class ArquivosViewState extends State<ArquivosView> {
+  final _controller = ArquivoDeletavelController();
   Future<List<ArquivoDeletavel>>? arquivosFuture;
-  bool inverter = false;
-  bool exibirUltimo = false;
 
   @override
   void initState() {
@@ -24,15 +23,12 @@ class ArquivosViewState extends State<ArquivosView> {
 
   void loadArquivos() {
     setState(() {
-      arquivosFuture = ArquivoDeletavelController(
-        inverter: inverter,
-        exibirUltimo: exibirUltimo,
-      ).getArquivos();
+      arquivosFuture = _controller.getArquivos();
     });
   }
 
-  void _toggleState(void Function() stateChange) {
-    setState(stateChange);
+  void _toggleAndReload(void Function() mutate) {
+    mutate();
     loadArquivos();
   }
 
@@ -45,12 +41,21 @@ class ArquivosViewState extends State<ArquivosView> {
         actions: <Widget>[
           IconButton(icon: const Icon(Icons.refresh), onPressed: loadArquivos),
           IconButton(
-            icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
-            onPressed: () => _toggleState(() => inverter = !inverter),
+            icon: Icon(
+              _controller.inverter ? Icons.fast_forward : Icons.fast_rewind,
+            ),
+            onPressed: () =>
+                _toggleAndReload(() => _controller.inverter = !_controller.inverter),
           ),
           IconButton(
-            icon: Icon(exibirUltimo ? Icons.visibility_off : Icons.visibility),
-            onPressed: () => _toggleState(() => exibirUltimo = !exibirUltimo),
+            icon: Icon(
+              _controller.exibirUltimo
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+            ),
+            onPressed: () => _toggleAndReload(
+              () => _controller.exibirUltimo = !_controller.exibirUltimo,
+            ),
           ),
         ],
       ),
@@ -62,11 +67,11 @@ class ArquivosViewState extends State<ArquivosView> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Erro: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return SemArquivosWidget();
+            return const SemArquivosWidget();
           } else {
             final arquivos = snapshot.data!;
             return ArquivosWidget(arquivos, (file) async {
-              await ArquivoDeletavelController().deleteFile(file);
+              await _controller.deleteFile(file);
               loadArquivos();
             });
           }
@@ -78,7 +83,7 @@ class ArquivosViewState extends State<ArquivosView> {
         onPressed: () async {
           final arquivos = await arquivosFuture;
           if (arquivos != null) {
-            await ArquivoDeletavelController().deleteFiles(arquivos);
+            await _controller.deleteFiles(arquivos);
             loadArquivos();
           }
         },

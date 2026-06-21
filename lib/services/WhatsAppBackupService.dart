@@ -42,27 +42,20 @@ class WhatsAppBackupService {
         .toSet()
         .toList();
 
-    // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories = pastas
-        .map((path) => Directory(path))
-        .where((dir) => dir.existsSync());
-
-    // Asynchronously list files from all directories.
-    final List<Future<List<FileSystemEntity>>>
-    fileListFutures = existingDirectories.map((dir) async {
+    // List files from directories that exist; skip missing paths without blocking.
+    final fileListFutures = pastas.map((path) async {
+      final dir = Directory(path);
       try {
-        // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
-        // which could lead to a client-side Denial of Service (DoS) if a
-        // directory is very large or slow to access.
+        if (!await dir.exists()) {
+          return <FileSystemEntity>[];
+        }
         return await dir.list().toList();
       } on FileSystemException catch (e) {
-        // Log the error and return an empty list to avoid crashing.
         debugPrint('Could not list files in ${dir.path}: $e');
         return <FileSystemEntity>[];
       }
-    }).toList();
+    });
 
-    // Wait for all file listing operations to complete and flatten the list.
     final allFileLists = await Future.wait(fileListFutures);
     return allFileLists.expand((fileList) => fileList).toList();
   }
