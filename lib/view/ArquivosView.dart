@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
 import '../controller/ArquivoDeletavelController.dart';
+import '../core/error_handler.dart';
 import './ArquivosWidget.dart';
 import './SemArquivosWidget.dart';
 
@@ -60,7 +61,8 @@ class ArquivosViewState extends State<ArquivosView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
+            ErrorHandler.reportError(snapshot.error, snapshot.stackTrace, 'ArquivosView FutureBuilder');
+            return const Center(child: Text('Ocorreu um erro ao carregar os arquivos. Tente novamente mais tarde.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return SemArquivosWidget();
           } else {

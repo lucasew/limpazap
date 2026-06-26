@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-
 import '../model/ArquivoDeletavelModel.dart';
 import '../services/WhatsAppBackupService.dart';
+import '../core/error_handler.dart';
 
 /// Manages the retrieval, filtering, and deletion of WhatsApp backup files.
 ///
@@ -80,9 +79,9 @@ class ArquivoDeletavelController {
         await file.arquivo.exists()) {
       try {
         await file.arquivo.delete();
-      } on FileSystemException catch (e) {
+      } on FileSystemException catch (e, stackTrace) {
         // Log if deletion fails for any reason (e.g., permissions).
-        debugPrint('Failed to delete ${file.arquivo.path}: $e');
+        ErrorHandler.reportError(e, stackTrace, 'ArquivoDeletavelController delete ${file.arquivo.path}');
       }
     }
   }

@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import '../core/error_handler.dart';
 
 class WhatsAppBackupService {
   /// Scans external storage for WhatsApp backup files.
@@ -55,9 +55,9 @@ class WhatsAppBackupService {
         // which could lead to a client-side Denial of Service (DoS) if a
         // directory is very large or slow to access.
         return await dir.list().toList();
-      } on FileSystemException catch (e) {
+      } on FileSystemException catch (e, stackTrace) {
         // Log the error and return an empty list to avoid crashing.
-        debugPrint('Could not list files in ${dir.path}: $e');
+        ErrorHandler.reportError(e, stackTrace, 'WhatsAppBackupService list files in ${dir.path}');
         return <FileSystemEntity>[];
       }
     }).toList();
