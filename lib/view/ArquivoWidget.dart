@@ -7,7 +7,7 @@ class ArquivoWidget extends StatelessWidget {
   const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
 
   String get _textoDataCriacao {
-    var d = arquivo.dataCriacao;
+    final d = arquivo.dataCriacao;
     return "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}";
   }
 
