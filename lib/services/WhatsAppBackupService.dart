@@ -13,43 +13,36 @@ class WhatsAppBackupService {
       return [];
     }
 
+    // Define relative paths to WhatsApp database directories centrally to reduce code duplication.
+    const relativePaths = [
+      ['Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'],
+      [
+        'Android',
+        'media',
+        'com.whatsapp.w4b',
+        'WhatsApp Business',
+        'Databases'
+      ],
+      ['WhatsApp', 'Databases'],
+      ['GBWhatsApp', 'Databases'],
+    ];
+
     // SECURITY-NOTE: Using p.join prevents path traversal vulnerabilities
     // by ensuring that path components are correctly and safely combined.
     final pastas = externalDirs
         .map((dir) => dir.path.split('/Android/')[0])
-        .expand(
-          (basePath) => [
-            p.join(
-              basePath,
-              'Android',
-              'media',
-              'com.whatsapp',
-              'WhatsApp',
-              'Databases',
-            ),
-            p.join(
-              basePath,
-              'Android',
-              'media',
-              'com.whatsapp.w4b',
-              'WhatsApp Business',
-              'Databases',
-            ),
-            p.join(basePath, 'WhatsApp', 'Databases'),
-            p.join(basePath, 'GBWhatsApp', 'Databases'),
-          ],
-        )
+        .expand((basePath) =>
+            relativePaths.map((parts) => p.joinAll([basePath, ...parts])))
         .toSet()
         .toList();
 
     // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories = pastas
-        .map((path) => Directory(path))
-        .where((dir) => dir.existsSync());
+    final existingDirectories =
+        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
 
     // Asynchronously list files from all directories.
-    final List<Future<List<FileSystemEntity>>>
-    fileListFutures = existingDirectories.map((dir) async {
+    final List<Future<List<FileSystemEntity>>> fileListFutures =
+        existingDirectories.map((dir) async {
       try {
         // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
         // which could lead to a client-side Denial of Service (DoS) if a
@@ -57,7 +50,8 @@ class WhatsAppBackupService {
         return await dir.list().toList();
       } on FileSystemException catch (e, stackTrace) {
         // Log the error and return an empty list to avoid crashing.
-        ErrorHandler.reportError(e, stackTrace, 'WhatsAppBackupService list files in ${dir.path}');
+        ErrorHandler.reportError(
+            e, stackTrace, 'WhatsAppBackupService list files in ${dir.path}');
         return <FileSystemEntity>[];
       }
     }).toList();
