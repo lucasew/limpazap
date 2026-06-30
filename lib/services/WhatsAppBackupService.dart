@@ -30,7 +30,7 @@ class WhatsAppBackupService {
     // SECURITY-NOTE: Using p.join prevents path traversal vulnerabilities
     // by ensuring that path components are correctly and safely combined.
     final pastas = externalDirs
-        .map((dir) => dir.path.split('/Android/')[0])
+        .map((dir) => dir.path.split('${p.separator}Android${p.separator}')[0])
         .expand((basePath) =>
             relativePaths.map((parts) => p.joinAll([basePath, ...parts])))
         .toSet()
