@@ -24,6 +24,7 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void loadArquivos() {
+    if (!mounted) return;
     setState(() {
       arquivosFuture = ArquivoDeletavelController(
         inverter: inverter,
@@ -33,6 +34,7 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void _toggleState(void Function() stateChange) {
+    if (!mounted) return;
     setState(stateChange);
     loadArquivos();
   }
