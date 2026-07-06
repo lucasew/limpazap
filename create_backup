@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
+if [ "$#" -lt 1 ]; then
+  echo "Usage: $0 <size_in_mb>"
+  exit 1
+fi
+
 MB="$1"
 shift
-adb shell mkdir -p /sdcard/WhatsApp/Databases
-adb shell dd if=/dev/zero of="/sdcard/WhatsApp/Databases/msgstore-$RANDOM-$RANDOM-$RANDOM.1.db.crypt12" bs=1m count="$MB"
+
+BACKUP_DIR="/sdcard/WhatsApp/Databases"
+adb shell mkdir -p "$BACKUP_DIR"
+adb shell dd if=/dev/zero of="$BACKUP_DIR/msgstore-$RANDOM-$RANDOM-$RANDOM.1.db.crypt12" bs=1m count="$MB"

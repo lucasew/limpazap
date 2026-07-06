@@ -1,0 +1,15 @@
+Assumptions:
+- The script `create_backup` is primarily run in an environment where `/sdcard` is the target directory, but using a local variable makes the path modular and reduces duplication of hardcoded paths.
+- The `set -u` option in the script caused it to fail when no argument was passed for `$1`. Catching this explicitely resolves `shellcheck` errors and execution bugs.
+- No further validations are needed on the arguments.
+
+Alternatives Not Chosen:
+- Removing `set -u` from the bash script. This would bypass the shellcheck issue but is a bad practice for bash scripting.
+
+How To Pivot:
+- If the paths are expected to change dynamically in the future, the variable could be modified to accept an environment variable fallback (e.g. `BACKUP_DIR="${WHATSAPP_BACKUP_DIR:-/sdcard/WhatsApp/Databases}"`).
+
+Next Knobs:
+- Introduce configurable test directories via environment variables for `create_backup`.
+- Fix the remaining `hardcoded_paths` in `.devcontainer` configuration.
+- Implement tests specifically invoking `create_backup` script to ensure it generates dummy backups as expected.
