@@ -9,7 +9,11 @@ class ArquivosWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widgets = arquivos.map((a) => ArquivoWidget(a, onDelete)).toList();
-    return ListView(children: widgets);
+    return ListView.builder(
+      itemCount: arquivos.length,
+      itemBuilder: (context, index) {
+        return ArquivoWidget(arquivos[index], onDelete);
+      },
+    );
   }
 }
