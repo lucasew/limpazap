@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
 class ErrorHandler {
@@ -6,15 +5,15 @@ class ErrorHandler {
     // In a real application, this would integrate with Sentry or another crash reporting tool.
     // For now, we log the error securely and consistently.
     if (kDebugMode) {
-      log('================ ERROR ================');
+      debugPrint('================ ERROR ================');
       if (context != null) {
-        log('Context: $context');
+        debugPrint('Context: $context');
       }
-      log('Error: $error');
+      debugPrint('Error: $error');
       if (stackTrace != null) {
-        log('StackTrace: $stackTrace');
+        debugPrint('StackTrace: $stackTrace');
       }
-      log('=======================================');
+      debugPrint('=======================================');
     }
   }
 }

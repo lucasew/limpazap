@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'view/ArquivosView.dart';
 
-import 'dart:developer';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,10 +24,8 @@ Future<void> checarPermissao() async {
 
   // Otherwise, request the storage permission.
   final status = await Permission.storage.request();
-  // Use log to output permission status only in debug mode.
-  if (kDebugMode) {
-    log('Storage permission request result: $status');
-  }
+  // Use debugPrint to log permission status only in debug mode.
+  debugPrint('Storage permission request result: $status');
 }
 
 void main() async {
