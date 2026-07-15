@@ -34,5 +34,5 @@ void main() async {
     await WakelockPlus.enable();
   }
   await checarPermissao();
-  runApp(MaterialApp(home: ArquivosView()));
+  runApp(const MaterialApp(title: 'Limpazap', home: ArquivosView()));
 }
