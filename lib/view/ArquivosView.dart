@@ -44,13 +44,21 @@ class ArquivosViewState extends State<ArquivosView> {
         title: const Text('Limpazap', overflow: TextOverflow.visible),
         backgroundColor: Colors.green,
         actions: <Widget>[
-          IconButton(icon: const Icon(Icons.refresh), onPressed: loadArquivos),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Atualizar',
+            onPressed: loadArquivos,
+          ),
           IconButton(
             icon: Icon(inverter ? Icons.fast_forward : Icons.fast_rewind),
+            tooltip: inverter ? 'Mais antigos primeiro' : 'Mais recentes primeiro',
             onPressed: () => _toggleState(() => inverter = !inverter),
           ),
           IconButton(
             icon: Icon(exibirUltimo ? Icons.visibility_off : Icons.visibility),
+            tooltip: exibirUltimo
+                ? 'Ocultar banco de dados ativo'
+                : 'Exibir banco de dados ativo',
             onPressed: () => _toggleState(() => exibirUltimo = !exibirUltimo),
           ),
         ],
@@ -64,7 +72,7 @@ class ArquivosViewState extends State<ArquivosView> {
             ErrorHandler.reportError(snapshot.error, snapshot.stackTrace, 'ArquivosView FutureBuilder');
             return const Center(child: Text('Ocorreu um erro ao carregar os arquivos. Tente novamente mais tarde.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return SemArquivosWidget();
+            return const SemArquivosWidget();
           } else {
             final arquivos = snapshot.data!;
             return ArquivosWidget(arquivos, (file) async {
@@ -76,6 +84,7 @@ class ArquivosViewState extends State<ArquivosView> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
+        tooltip: 'Apagar todos os backups listados',
         child: const Icon(Icons.delete_sweep),
         onPressed: () async {
           final arquivos = await arquivosFuture;
