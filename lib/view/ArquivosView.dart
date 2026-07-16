@@ -77,6 +77,7 @@ class ArquivosViewState extends State<ArquivosView> {
             final arquivos = snapshot.data!;
             return ArquivosWidget(arquivos, (file) async {
               await ArquivoDeletavelController().deleteFile(file);
+              if (!mounted) return;
               loadArquivos();
             });
           }
@@ -90,6 +91,7 @@ class ArquivosViewState extends State<ArquivosView> {
           final arquivos = await arquivosFuture;
           if (arquivos != null) {
             await ArquivoDeletavelController().deleteFiles(arquivos);
+            if (!mounted) return;
             loadArquivos();
           }
         },
