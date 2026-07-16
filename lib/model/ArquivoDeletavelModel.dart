@@ -1,17 +1,27 @@
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+
 /// Represents a WhatsApp database file found in storage.
 ///
 /// This model encapsulates file metadata (like size and modification date)
 /// to avoid repeated synchronous file system calls, which could block the UI.
 /// Instances of this class are typically created via the [load] factory method.
 class ArquivoDeletavel {
-  /// Regular expression to identify backup files (e.g., `msgstore-2023-01-01...`).
+  /// Regular expression to identify historical backup *file names*
+  /// (e.g., `msgstore-2023-01-01.1.db.crypt15`).
   ///
-  /// Files matching this pattern are considered historical backups.
-  /// Files NOT matching this pattern are considered the active/latest database.
-  /// Centralizing this pattern avoids code duplication and ensures consistency.
-  static final RegExp regexBackup = RegExp('msgstore-');
+  /// Always apply this to [p.basename], never to a full path: a parent
+  /// directory that happens to contain `msgstore-` must not reclassify the
+  /// active database as a deletable backup.
+  static final RegExp regexBackup = RegExp(r'^msgstore-');
+
+  /// True when the file name is a historical WhatsApp backup (`msgstore-…`).
+  ///
+  /// Uses the basename only so path segments cannot trigger a false match.
+  static bool isHistoricalBackup(FileSystemEntity entity) {
+    return regexBackup.hasMatch(p.basename(entity.path));
+  }
 
   /// The underlying file system entity.
   final FileSystemEntity arquivo;
