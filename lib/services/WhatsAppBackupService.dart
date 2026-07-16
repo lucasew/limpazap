@@ -36,14 +36,15 @@ class WhatsAppBackupService {
         .toSet()
         .toList();
 
-    // Convert paths to Directory objects and filter out non-existent ones.
-    final existingDirectories =
-        pastas.map((path) => Directory(path)).where((dir) => dir.existsSync());
-
-    // Asynchronously list files from all directories.
+    // Asynchronously check existence then list files. Avoid existsSync/listSync
+    // so a slow or large volume cannot freeze the UI isolate.
     final List<Future<List<FileSystemEntity>>> fileListFutures =
-        existingDirectories.map((dir) async {
+        pastas.map((path) async {
+      final dir = Directory(path);
       try {
+        if (!await dir.exists()) {
+          return <FileSystemEntity>[];
+        }
         // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
         // which could lead to a client-side Denial of Service (DoS) if a
         // directory is very large or slow to access.
