@@ -51,20 +51,20 @@ class ArquivoDeletavelController {
       ),
     );
 
-    // Filter and sort.
+    // Filter using the isUltimo flag already computed at load time (avoids a
+    // second regex pass that could drift from ArquivoDeletavel.load).
     final deletableFiles = deletableFilesList
-        .where(
-          (file) =>
-              exibirUltimo ||
-              ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path),
-        )
+        .where((file) => exibirUltimo || !file.isUltimo)
         .toList();
 
-    // Sort files by creation date.
-    deletableFiles.sort((a, b) => a.dataCriacao.compareTo(b.dataCriacao));
-
-    // Reverse the list if specified and return.
-    return inverter ? deletableFiles.reversed.toList() : deletableFiles;
+    // Sort by date in one pass; inverter flips the comparator so we do not
+    // allocate a reversed copy of the list.
+    deletableFiles.sort(
+      (a, b) => inverter
+          ? b.dataCriacao.compareTo(a.dataCriacao)
+          : a.dataCriacao.compareTo(b.dataCriacao),
+    );
+    return deletableFiles;
   }
 
   /// Deletes a single file with safety checks.
