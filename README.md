@@ -3,7 +3,7 @@
 </center>
 
 <p align="center">
-  <img alt="ultima tentativa de compilação" src="https://img.shields.io/github/workflow/status/lucasew/limpazap/release?label=Compila%C3%A7%C3%A3o%20de%20APK&logo=github&style=flat-square" />
+  <img alt="ultima tentativa de compilação" src="https://img.shields.io/github/actions/workflow/status/lucasew/limpazap/release.yml?label=Compila%C3%A7%C3%A3o%20de%20APK&logo=github&style=flat-square" />
   <img alt="ultima versão" src="https://img.shields.io/github/v/release/lucasew/limpazap?label=Ultima%20vers%C3%A3o&logo=github&style=flat-square" />
   <img alt="downloads ultima versão" src="https://img.shields.io/github/downloads/lucasew/limpazap/latest/total?label=Downloads%20ultima%20vers%C3%A3o&logo=github&style=flat-square" />
 </p>
