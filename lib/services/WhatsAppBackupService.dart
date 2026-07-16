@@ -4,6 +4,18 @@ import 'package:path/path.dart' as p;
 import '../core/error_handler.dart';
 
 class WhatsAppBackupService {
+  /// True when [entity] is a regular file whose name is a WhatsApp database
+  /// (`msgstore.db.crypt*` active DB or `msgstore-*` historical backup).
+  ///
+  /// Exposed for unit tests; used when scanning Databases directories so non-DB
+  /// entries never reach the controller/UI.
+  static bool isWhatsAppDatabaseFile(FileSystemEntity entity) {
+    if (entity is! File) {
+      return false;
+    }
+    return p.basename(entity.path).startsWith('msgstore');
+  }
+
   /// Scans external storage for WhatsApp backup files.
   Future<List<FileSystemEntity>> getBackupFiles() async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
@@ -48,7 +60,13 @@ class WhatsAppBackupService {
         // SECURITY-NOTE: Using async `list` prevents blocking the main thread,
         // which could lead to a client-side Denial of Service (DoS) if a
         // directory is very large or slow to access.
-        return await dir.list().toList();
+        // Only keep real WhatsApp database files (active msgstore.db.crypt* and
+        // historical msgstore-* backups). Directories, .nomedia, and other
+        // junk in Databases/ must not enter the delete pipeline.
+        return await dir
+            .list(followLinks: false)
+            .where((entity) => isWhatsAppDatabaseFile(entity))
+            .toList();
       } on FileSystemException catch (e, stackTrace) {
         // Log the error and return an empty list to avoid crashing.
         ErrorHandler.reportError(
