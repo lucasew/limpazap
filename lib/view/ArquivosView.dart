@@ -77,6 +77,8 @@ class ArquivosViewState extends State<ArquivosView> {
             final arquivos = snapshot.data!;
             return ArquivosWidget(arquivos, (file) async {
               await ArquivoDeletavelController().deleteFile(file);
+              // Deletion is async; the user may have left this route.
+              if (!mounted) return;
               loadArquivos();
             });
           }
@@ -88,8 +90,10 @@ class ArquivosViewState extends State<ArquivosView> {
         child: const Icon(Icons.delete_sweep),
         onPressed: () async {
           final arquivos = await arquivosFuture;
+          if (!mounted) return;
           if (arquivos != null) {
             await ArquivoDeletavelController().deleteFiles(arquivos);
+            if (!mounted) return;
             loadArquivos();
           }
         },
