@@ -42,11 +42,12 @@ class ArquivoDeletavelController {
     final allFiles = await _service.getBackupFiles();
 
     // Map files to the ArquivoDeletavel model asynchronously.
+    // isUltimo is derived from the file *name* only (see isHistoricalBackup).
     final deletableFilesList = await Future.wait(
       allFiles.map(
         (file) => ArquivoDeletavel.load(
           file,
-          isUltimo: !ArquivoDeletavel.regexBackup.hasMatch(file.path),
+          isUltimo: !ArquivoDeletavel.isHistoricalBackup(file),
         ),
       ),
     );
@@ -72,10 +73,10 @@ class ArquivoDeletavelController {
   /// This method performs a TOCTOU check to ensure the file still exists
   /// and matches the backup regex before attempting deletion.
   Future<void> deleteFile(ArquivoDeletavel file) async {
-    // SECURITY-NOTE: Re-verify the file path and existence before deleting
-    // to mitigate a Time-of-check to Time-of-use (TOCTOU) race condition.
-    // This ensures we only delete expected backup files.
-    if (ArquivoDeletavel.regexBackup.hasMatch(file.arquivo.path) &&
+    // SECURITY-NOTE: Re-verify basename + existence before deleting to mitigate
+    // TOCTOU and to refuse the active DB even if a parent path contains
+    // `msgstore-` (full-path matching used to allow that false positive).
+    if (ArquivoDeletavel.isHistoricalBackup(file.arquivo) &&
         await file.arquivo.exists()) {
       try {
         await file.arquivo.delete();
