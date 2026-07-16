@@ -6,25 +6,30 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> checarPermissao() async {
-  // Request `manageExternalStorage` first for modern Android versions.
-  if (!await Permission.manageExternalStorage.status.isGranted) {
-    await Permission.manageExternalStorage.request();
+  // Android 11+: all-files access is what reaches WhatsApp Databases outside
+  // app-specific storage. If we already have it (or the user just granted it),
+  // do not fall through to legacy storage checks — those can still be denied
+  // and would incorrectly open system settings.
+  if (await Permission.manageExternalStorage.status.isGranted) {
+    return;
   }
 
-  // Then, check for the general storage permission.
+  final manageStatus = await Permission.manageExternalStorage.request();
+  if (manageStatus.isGranted) {
+    return;
+  }
+
+  // Older Android / fallback when all-files access is unavailable.
   if (await Permission.storage.status.isGranted) {
-    return; // Exit if permission is granted.
+    return;
   }
 
-  // If storage permission is permanently denied, guide the user to settings.
   if (await Permission.storage.isPermanentlyDenied) {
     await openAppSettings();
     return;
   }
 
-  // Otherwise, request the storage permission.
   final status = await Permission.storage.request();
-  // Use debugPrint to log permission status only in debug mode.
   debugPrint('Storage permission request result: $status');
 }
 
