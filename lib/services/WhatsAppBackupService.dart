@@ -4,6 +4,32 @@ import 'package:path/path.dart' as p;
 import '../core/error_handler.dart';
 
 class WhatsAppBackupService {
+  /// Relative path segments (from each external-storage root) where WhatsApp
+  /// distributions store local encrypted database backups.
+  ///
+  /// Covers modern scoped-storage locations (`Android/media/<package>/…`) and
+  /// the older top-level folders still present on many devices. Personal
+  /// WhatsApp and WhatsApp Business each have both forms; GBWhatsApp only has
+  /// the legacy layout.
+  ///
+  /// Exposed for unit tests so the scan set cannot silently drop a variant.
+  static const databaseRelativePaths = [
+    ['Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'],
+    [
+      'Android',
+      'media',
+      'com.whatsapp.w4b',
+      'WhatsApp Business',
+      'Databases',
+    ],
+    ['WhatsApp', 'Databases'],
+    // Legacy WhatsApp Business (pre-scoped-storage). Personal WhatsApp already
+    // has a matching top-level entry above; Business was missing and backups
+    // on that path were never listed.
+    ['WhatsApp Business', 'Databases'],
+    ['GBWhatsApp', 'Databases'],
+  ];
+
   /// True when [entity] is a regular file whose name is a WhatsApp database
   /// (`msgstore.db.crypt*` active DB or `msgstore-*` historical backup).
   ///
@@ -25,26 +51,12 @@ class WhatsAppBackupService {
       return [];
     }
 
-    // Define relative paths to WhatsApp database directories centrally to reduce code duplication.
-    const relativePaths = [
-      ['Android', 'media', 'com.whatsapp', 'WhatsApp', 'Databases'],
-      [
-        'Android',
-        'media',
-        'com.whatsapp.w4b',
-        'WhatsApp Business',
-        'Databases'
-      ],
-      ['WhatsApp', 'Databases'],
-      ['GBWhatsApp', 'Databases'],
-    ];
-
     // SECURITY-NOTE: Using p.join prevents path traversal vulnerabilities
     // by ensuring that path components are correctly and safely combined.
     final pastas = externalDirs
         .map((dir) => dir.path.split('${p.separator}Android${p.separator}')[0])
-        .expand((basePath) =>
-            relativePaths.map((parts) => p.joinAll([basePath, ...parts])))
+        .expand((basePath) => databaseRelativePaths
+            .map((parts) => p.joinAll([basePath, ...parts])))
         .toSet()
         .toList();
 
