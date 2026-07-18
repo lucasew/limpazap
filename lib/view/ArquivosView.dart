@@ -89,12 +89,23 @@ class ArquivosViewState extends State<ArquivosView> {
         tooltip: 'Apagar todos os backups listados',
         child: const Icon(Icons.delete_sweep),
         onPressed: () async {
-          final arquivos = await arquivosFuture;
-          if (!mounted) return;
-          if (arquivos != null) {
-            await ArquivoDeletavelController().deleteFiles(arquivos);
+          try {
+            final arquivos = await arquivosFuture;
+            if (!mounted) return;
+            if (arquivos == null) return;
+            // Match deleteFile safety: only historical backups (never isUltimo).
+            final backups =
+                arquivos.where((arquivo) => !arquivo.isUltimo).toList();
+            if (backups.isEmpty) return;
+            await ArquivoDeletavelController().deleteFiles(backups);
             if (!mounted) return;
             loadArquivos();
+          } catch (e, stackTrace) {
+            ErrorHandler.reportError(
+              e,
+              stackTrace,
+              'ArquivosView bulk delete',
+            );
           }
         },
       ),

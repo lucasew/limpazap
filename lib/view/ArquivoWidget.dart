@@ -54,17 +54,29 @@ class ArquivoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Active DB (isUltimo) is never deleted by the controller (regex safety).
+    // Disable swipe so the row does not animate away and snap back after a no-op.
+    final canDelete = !arquivo.isUltimo;
     return Center(
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
+        direction:
+            canDelete ? DismissDirection.horizontal : DismissDirection.none,
         background: _buildDismissBackground(alignment: Alignment.centerLeft),
         secondaryBackground: _buildDismissBackground(
           alignment: Alignment.centerRight,
         ),
-        onDismissed: (_) {
-          onDelete(arquivo);
-        },
-        child: Center(child: _buildListTile()),
+        onDismissed: canDelete
+            ? (_) {
+                onDelete(arquivo);
+              }
+            : null,
+        child: Tooltip(
+          message: canDelete
+              ? 'Deslize para apagar o backup'
+              : 'Banco de dados ativo — não pode ser apagado',
+          child: Center(child: _buildListTile()),
+        ),
       ),
     );
   }
