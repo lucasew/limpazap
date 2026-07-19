@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import '../model/ArquivoDeletavelModel.dart';
 
+/// Formats a backup timestamp for the large-type list row.
+///
+/// Day, month, hour, and minute are zero-padded so labels stay the same
+/// width while scrolling (e.g. `01.01.2024 09:05` instead of `1.1.2024 9:05`).
+@visibleForTesting
+String formatBackupDateTime(DateTime d) {
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
+}
+
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
   final Function(ArquivoDeletavel) onDelete;
   const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
 
-  String get _textoDataCriacao {
-    final d = arquivo.dataCriacao;
-    return "${d.day}.${d.month}.${d.year} ${d.hour}:${d.minute.toString().padLeft(2, '0')}";
-  }
+  String get _textoDataCriacao => formatBackupDateTime(arquivo.dataCriacao);
 
   String get _textoTamanho {
     return '${(arquivo.tamanho / 1000000).round()} MB';
