@@ -113,12 +113,21 @@ class ArquivosViewState extends State<ArquivosView> {
             return const SemArquivosWidget();
           } else {
             final arquivos = snapshot.data!;
-            return ArquivosWidget(arquivos, (file) async {
-              await ArquivoDeletavelController().deleteFile(file);
-              // Deletion is async; the user may have left this route.
-              if (!mounted) return;
-              loadArquivos();
-            });
+            return ArquivosWidget(
+              arquivos,
+              (file) async {
+                // Same busy flag as the FAB: refuse single-row deletes while a
+                // bulk sweep is in flight (avoids concurrent delete + reload).
+                if (_bulkDeleting) return;
+                await ArquivoDeletavelController().deleteFile(file);
+                // Deletion is async; the user may have left this route.
+                if (!mounted) return;
+                loadArquivos();
+              },
+              // Disable swipe UI for the whole list during bulk delete so a
+              // Dismissible cannot animate away mid-sweep.
+              allowDelete: !_bulkDeleting,
+            );
           }
         },
       ),

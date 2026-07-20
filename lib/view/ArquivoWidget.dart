@@ -11,10 +11,32 @@ String formatBackupDateTime(DateTime d) {
   return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
 }
 
+/// Whether a list row may be swipe-deleted.
+///
+/// Active DB rows ([isUltimo]) are never deletable. Historical backups can be
+/// dismissed only when [allowDelete] is true (false while a bulk delete runs).
+@visibleForTesting
+bool isSwipeDeleteEnabled({
+  required bool isUltimo,
+  required bool allowDelete,
+}) {
+  return allowDelete && !isUltimo;
+}
+
 class ArquivoWidget extends StatelessWidget {
   final ArquivoDeletavel arquivo;
   final Function(ArquivoDeletavel) onDelete;
-  const ArquivoWidget(this.arquivo, this.onDelete, {super.key});
+
+  /// When false, swipe-to-delete is disabled for every row (used while bulk
+  /// delete is in flight so a swipe cannot race the sweep).
+  final bool allowDelete;
+
+  const ArquivoWidget(
+    this.arquivo,
+    this.onDelete, {
+    this.allowDelete = true,
+    super.key,
+  });
 
   String get _textoDataCriacao => formatBackupDateTime(arquivo.dataCriacao);
 
@@ -59,11 +81,25 @@ class ArquivoWidget extends StatelessWidget {
     );
   }
 
+  String get _tooltipMessage {
+    if (arquivo.isUltimo) {
+      return 'Banco de dados ativo — não pode ser apagado';
+    }
+    if (!allowDelete) {
+      return 'Aguarde o fim da exclusão em lote';
+    }
+    return 'Deslize para apagar o backup';
+  }
+
   @override
   Widget build(BuildContext context) {
     // Active DB (isUltimo) is never deleted by the controller (regex safety).
-    // Disable swipe so the row does not animate away and snap back after a no-op.
-    final canDelete = !arquivo.isUltimo;
+    // Also block swipe while the parent disables deletes (bulk sweep in flight)
+    // so the row does not animate away and race concurrent deleteFiles.
+    final canDelete = isSwipeDeleteEnabled(
+      isUltimo: arquivo.isUltimo,
+      allowDelete: allowDelete,
+    );
     return Center(
       child: Dismissible(
         key: Key(arquivo.arquivo.path),
@@ -79,9 +115,7 @@ class ArquivoWidget extends StatelessWidget {
               }
             : null,
         child: Tooltip(
-          message: canDelete
-              ? 'Deslize para apagar o backup'
-              : 'Banco de dados ativo — não pode ser apagado',
+          message: _tooltipMessage,
           child: Center(child: _buildListTile()),
         ),
       ),
