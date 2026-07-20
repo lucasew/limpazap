@@ -13,4 +13,28 @@ void main() {
       expect(formatBackupDateTime(d), '23.11.2024 15:45');
     });
   });
+
+  group('isSwipeDeleteEnabled', () {
+    test('allows swipe only for historical backups when deletes are allowed',
+        () {
+      expect(
+        isSwipeDeleteEnabled(isUltimo: false, allowDelete: true),
+        isTrue,
+      );
+    });
+
+    test('never allows swipe on the active database', () {
+      expect(
+        isSwipeDeleteEnabled(isUltimo: true, allowDelete: true),
+        isFalse,
+      );
+    });
+
+    test('blocks swipe on backups while allowDelete is false (bulk busy)', () {
+      expect(
+        isSwipeDeleteEnabled(isUltimo: false, allowDelete: false),
+        isFalse,
+      );
+    });
+  });
 }
