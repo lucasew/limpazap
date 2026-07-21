@@ -11,6 +11,28 @@ String formatBackupDateTime(DateTime d) {
   return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
 }
 
+/// Formats a backup file size for the large-type list row.
+///
+/// Uses SI decimal units (1000-based) to match the historical `MB` label.
+/// Picks B / KB / MB / GB so small files never show as `0 MB` (the old
+/// always-round-to-megabytes path did for anything under ~500 KB).
+@visibleForTesting
+String formatBackupSize(int bytes) {
+  if (bytes < 0) {
+    bytes = 0;
+  }
+  if (bytes < 1000) {
+    return '$bytes B';
+  }
+  if (bytes < 1000 * 1000) {
+    return '${(bytes / 1000).round()} KB';
+  }
+  if (bytes < 1000 * 1000 * 1000) {
+    return '${(bytes / (1000 * 1000)).round()} MB';
+  }
+  return '${(bytes / (1000 * 1000 * 1000)).round()} GB';
+}
+
 /// Whether a list row may be swipe-deleted.
 ///
 /// Active DB rows ([isUltimo]) are never deletable. Historical backups can be
@@ -40,9 +62,7 @@ class ArquivoWidget extends StatelessWidget {
 
   String get _textoDataCriacao => formatBackupDateTime(arquivo.dataCriacao);
 
-  String get _textoTamanho {
-    return '${(arquivo.tamanho / 1000000).round()} MB';
-  }
+  String get _textoTamanho => formatBackupSize(arquivo.tamanho);
 
   Widget _buildTitle() {
     return ConstrainedBox(

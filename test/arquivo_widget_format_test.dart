@@ -37,4 +37,34 @@ void main() {
       );
     });
   });
+
+  group('formatBackupSize', () {
+    test('shows bytes below 1 KB', () {
+      expect(formatBackupSize(0), '0 B');
+      expect(formatBackupSize(512), '512 B');
+      expect(formatBackupSize(999), '999 B');
+    });
+
+    test('shows KB for small backups instead of 0 MB', () {
+      // Old always-MB rounding: 200000 / 1e6 = 0.2 → 0 MB.
+      expect(formatBackupSize(200000), '200 KB');
+      expect(formatBackupSize(1000), '1 KB');
+      expect(formatBackupSize(999999), '1000 KB');
+    });
+
+    test('shows MB for typical WhatsApp backups', () {
+      expect(formatBackupSize(1000000), '1 MB');
+      expect(formatBackupSize(45000000), '45 MB');
+      expect(formatBackupSize(999999999), '1000 MB');
+    });
+
+    test('shows GB for very large files', () {
+      expect(formatBackupSize(1000000000), '1 GB');
+      expect(formatBackupSize(2500000000), '3 GB');
+    });
+
+    test('clamps negative sizes to zero', () {
+      expect(formatBackupSize(-1), '0 B');
+    });
+  });
 }
