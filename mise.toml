@@ -7,7 +7,7 @@ yq = "4.50.1"
 shfmt = "3.12.0"
 shellcheck = "0.11.0"
 actionlint = "1.7.10"
-dprint = "0.51.1"
+dprint = "0.55.2"
 "npm:prettier" = "3.4.2"
 
 [tasks.setup-androidsdk]
