@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4
 
       - name: Setup the Android SDK part that sucks
         run: mise run setup-androidsdk
