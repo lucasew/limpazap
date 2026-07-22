@@ -36,7 +36,7 @@ jobs:
       - run: flutter build appbundle --release
 
       - name: Upload APK and AAB as workflow artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: limpazap-${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
           path: |
