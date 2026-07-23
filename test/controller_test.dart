@@ -2,25 +2,43 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:limpazap/controller/ArquivoDeletavelController.dart';
 import 'package:limpazap/model/ArquivoDeletavelModel.dart';
+import 'package:path/path.dart' as p;
 
 void main() {
   group('ArquivoDeletavel.isHistoricalBackup', () {
     test('matches historical backup file names', () {
-      final file = File('/sdcard/WhatsApp/Databases/msgstore-2024-01-01.1.db.crypt15');
+      final file = File(p.joinAll([
+        p.separator,
+        'sdcard',
+        'WhatsApp',
+        'Databases',
+        'msgstore-2024-01-01.1.db.crypt15'
+      ]));
       expect(ArquivoDeletavel.isHistoricalBackup(file), isTrue);
     });
 
     test('does not match active database file names', () {
-      final file = File('/sdcard/WhatsApp/Databases/msgstore.db.crypt15');
+      final file = File(p.joinAll([
+        p.separator,
+        'sdcard',
+        'WhatsApp',
+        'Databases',
+        'msgstore.db.crypt15'
+      ]));
       expect(ArquivoDeletavel.isHistoricalBackup(file), isFalse);
     });
 
     test('ignores msgstore- in parent directory segments', () {
       // Full-path matching would false-positive here and treat the active DB
       // as a deletable backup.
-      final file = File(
-        '/sdcard/msgstore-exports/WhatsApp/Databases/msgstore.db.crypt15',
-      );
+      final file = File(p.joinAll([
+        p.separator,
+        'sdcard',
+        'msgstore-exports',
+        'WhatsApp',
+        'Databases',
+        'msgstore.db.crypt15'
+      ]));
       expect(ArquivoDeletavel.isHistoricalBackup(file), isFalse);
     });
   });
