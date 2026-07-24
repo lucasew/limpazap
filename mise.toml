@@ -1,6 +1,6 @@
 [tools]
 android-sdk = "11.0"
-flutter = "3.27.1"
+flutter = "3.44.8"
 java = "17"
 usage = "2.12.0"
 yq = "4.50.1"
