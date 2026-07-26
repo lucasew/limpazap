@@ -50,11 +50,20 @@ class ArquivoDeletavel {
   /// This method uses [FileSystemEntity.stat] to retrieve file information without
   /// blocking the main isolate, which is crucial for maintaining UI responsiveness
   /// when processing a large number of backup files.
+  ///
+  /// When [isUltimo] is omitted, it is derived from [isHistoricalBackup] so an
+  /// active database (`msgstore.db.crypt*`) is never classified as a deletable
+  /// historical backup by accident. Callers may still pass an explicit value.
   static Future<ArquivoDeletavel> load(
     FileSystemEntity arquivo, {
-    bool isUltimo = false,
+    bool? isUltimo,
   }) async {
     final stat = await arquivo.stat();
-    return ArquivoDeletavel._(arquivo, stat.modified, stat.size, isUltimo);
+    return ArquivoDeletavel._(
+      arquivo,
+      stat.modified,
+      stat.size,
+      isUltimo ?? !isHistoricalBackup(arquivo),
+    );
   }
 }
