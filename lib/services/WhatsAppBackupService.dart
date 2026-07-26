@@ -42,6 +42,28 @@ class WhatsAppBackupService {
     return p.basename(entity.path).startsWith('msgstore');
   }
 
+  /// Derives the shared external-storage root from a path_provider directory.
+  ///
+  /// `getExternalStorageDirectories()` returns app-scoped paths such as
+  /// `/storage/emulated/0/Android/data/<pkg>/files`. WhatsApp databases live
+  /// under the storage root (`…/WhatsApp/Databases`, `…/Android/media/…`), so
+  /// we strip from the first `Android` segment upward.
+  ///
+  /// Uses [p.split]/[p.joinAll] instead of a raw `String.split` on the
+  /// platform separator so empty segments and path quirks stay consistent with
+  /// the rest of this service. If [externalDirPath] has no `Android` segment,
+  /// the path is returned unchanged (best-effort for unusual layouts).
+  ///
+  /// Exposed for unit tests.
+  static String externalStorageRoot(String externalDirPath) {
+    final parts = p.split(externalDirPath);
+    final androidIdx = parts.indexOf('Android');
+    if (androidIdx <= 0) {
+      return externalDirPath;
+    }
+    return p.joinAll(parts.sublist(0, androidIdx));
+  }
+
   /// Scans external storage for WhatsApp backup files.
   Future<List<FileSystemEntity>> getBackupFiles() async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
@@ -54,7 +76,7 @@ class WhatsAppBackupService {
     // SECURITY-NOTE: Using p.join prevents path traversal vulnerabilities
     // by ensuring that path components are correctly and safely combined.
     final pastas = externalDirs
-        .map((dir) => dir.path.split('${p.separator}Android${p.separator}')[0])
+        .map((dir) => externalStorageRoot(dir.path))
         .expand((basePath) => databaseRelativePaths
             .map((parts) => p.joinAll([basePath, ...parts])))
         .toSet()
