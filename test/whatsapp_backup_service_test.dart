@@ -61,4 +61,57 @@ void main() {
       expect(WhatsAppBackupService.isWhatsAppDatabaseFile(dir), isFalse);
     });
   });
+
+  group('WhatsAppBackupService.externalStorageRoot', () {
+    test('strips app-scoped path from the first Android segment', () {
+      final external = p.join(
+        'storage',
+        'emulated',
+        '0',
+        'Android',
+        'data',
+        'com.lucao.limpazap',
+        'files',
+      );
+      expect(
+        WhatsAppBackupService.externalStorageRoot(external),
+        p.join('storage', 'emulated', '0'),
+      );
+    });
+
+    test('returns path unchanged when Android is missing', () {
+      final external = p.join('mnt', 'media_rw', 'ABCD-1234');
+      expect(
+        WhatsAppBackupService.externalStorageRoot(external),
+        external,
+      );
+    });
+
+    test('returns path unchanged when Android is the first segment', () {
+      // androidIdx == 0 → keep input (cannot strip to empty parent).
+      final external = p.join('Android', 'data', 'com.lucao.limpazap', 'files');
+      expect(
+        WhatsAppBackupService.externalStorageRoot(external),
+        external,
+      );
+    });
+
+    test('uses only the first Android segment when nested', () {
+      final external = p.join(
+        'storage',
+        'emulated',
+        '0',
+        'Android',
+        'data',
+        'com.example',
+        'files',
+        'Android',
+        'nested',
+      );
+      expect(
+        WhatsAppBackupService.externalStorageRoot(external),
+        p.join('storage', 'emulated', '0'),
+      );
+    });
+  });
 }
