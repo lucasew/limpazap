@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+    <!-- Light parent matches the white launch_background so the system chrome
+         does not flash black around the splash while Flutter starts. -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <!-- Show a splash screen on the activity. Automatically removed when
              Flutter draws its first frame -->
         <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+    <!-- Post-splash window theme for Flutter embedding v2 (referenced via
+         io.flutter.embedding.android.NormalTheme when the manifest declares it).
+         Night already defined this; day was missing and would fail resource
+         lookup in light mode once the meta-data is present. -->
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
     </style>
 </resources>
