@@ -1,19 +1,22 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
+/// Shared reporting for unexpected failures (scan, delete, UI load).
+///
+/// Uses [developer.log] in every build mode so release builds are not silent.
+/// Call sites already funnel through here; do not add a second facade.
 class ErrorHandler {
-  static void reportError(dynamic error, [StackTrace? stackTrace, String? context]) {
-    // In a real application, this would integrate with Sentry or another crash reporting tool.
-    // For now, we log the error securely and consistently.
-    if (kDebugMode) {
-      debugPrint('================ ERROR ================');
-      if (context != null) {
-        debugPrint('Context: $context');
-      }
-      debugPrint('Error: $error');
-      if (stackTrace != null) {
-        debugPrint('StackTrace: $stackTrace');
-      }
-      debugPrint('=======================================');
-    }
+  ErrorHandler._();
+
+  static void reportError(
+    Object? error, [
+    StackTrace? stackTrace,
+    String? context,
+  ]) {
+    developer.log(
+      error?.toString() ?? 'null',
+      name: context ?? 'ErrorHandler',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
