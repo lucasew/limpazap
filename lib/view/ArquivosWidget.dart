@@ -19,8 +19,12 @@ class ArquivosWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Bottom inset so the last large-type rows clear the parent FAB
+    // (ArquivosView bulk-delete). Without this, the sweep button covers
+    // the size/date labels on the final items.
     return ListView.builder(
       itemCount: arquivos.length,
+      padding: const EdgeInsets.only(bottom: 88),
       itemBuilder: (context, index) {
         return ArquivoWidget(
           arquivos[index],
