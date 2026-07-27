@@ -65,10 +65,25 @@ class WhatsAppBackupService {
   }
 
   /// Scans external storage for WhatsApp backup files.
+  ///
+  /// Recoverable storage/provider failures return an empty list (after
+  /// [ErrorHandler.reportError]) instead of failing the whole scan — same
+  /// posture as a missing Databases directory. Callers show the empty state
+  /// rather than a hard error for partial platform glitches.
   Future<List<FileSystemEntity>> getBackupFiles() async {
     // SECURITY: Use path_provider to avoid hardcoded paths.
     // Hardcoding `/sdcard/` is unreliable across Android versions.
-    final List<Directory>? externalDirs = await getExternalStorageDirectories();
+    final List<Directory>? externalDirs;
+    try {
+      externalDirs = await getExternalStorageDirectories();
+    } catch (e, stackTrace) {
+      ErrorHandler.reportError(
+        e,
+        stackTrace,
+        'WhatsAppBackupService getExternalStorageDirectories',
+      );
+      return [];
+    }
     if (externalDirs == null) {
       return [];
     }
@@ -101,8 +116,9 @@ class WhatsAppBackupService {
             .list(followLinks: false)
             .where((entity) => isWhatsAppDatabaseFile(entity))
             .toList();
-      } on FileSystemException catch (e, stackTrace) {
-        // Log the error and return an empty list to avoid crashing.
+      } catch (e, stackTrace) {
+        // Missing volumes, permission races, and non-FileSystemException
+        // platform errors: skip this directory, keep other roots.
         ErrorHandler.reportError(
             e, stackTrace, 'WhatsAppBackupService list files in ${dir.path}');
         return <FileSystemEntity>[];
