@@ -1,32 +1,18 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:limpazap/model/ArquivoDeletavelModel.dart';
 import 'package:limpazap/view/ArquivosView.dart';
+
+import 'support/temp_backup_dir.dart';
 
 void main() {
   group('withoutPendingDeletes', () {
-    late Directory tempDir;
+    final temp = TempBackupDir();
 
-    setUp(() async {
-      tempDir = await Directory.systemTemp.createTemp('limpazap_pending_');
-    });
-
-    tearDown(() async {
-      if (await tempDir.exists()) {
-        await tempDir.delete(recursive: true);
-      }
-    });
-
-    Future<ArquivoDeletavel> loadNamed(String name) async {
-      final file = File('${tempDir.path}/$name');
-      await file.create();
-      return ArquivoDeletavel.load(file);
-    }
+    setUp(() => temp.setUp(prefix: 'limpazap_pending_'));
+    tearDown(() => temp.tearDown());
 
     test('returns the same list when nothing is pending', () async {
-      final a = await loadNamed('msgstore-a.db');
-      final b = await loadNamed('msgstore-b.db');
+      final a = await temp.loadNamed('msgstore-a.db');
+      final b = await temp.loadNamed('msgstore-b.db');
       final files = [a, b];
 
       final filtered = withoutPendingDeletes(files, <String>{});
@@ -35,8 +21,8 @@ void main() {
     });
 
     test('drops rows whose path is in the pending set', () async {
-      final keep = await loadNamed('msgstore-keep.db');
-      final drop = await loadNamed('msgstore-drop.db');
+      final keep = await temp.loadNamed('msgstore-keep.db');
+      final drop = await temp.loadNamed('msgstore-drop.db');
 
       final filtered = withoutPendingDeletes(
         [keep, drop],
@@ -48,7 +34,7 @@ void main() {
     });
 
     test('returns empty when every row is pending', () async {
-      final only = await loadNamed('msgstore-only.db');
+      final only = await temp.loadNamed('msgstore-only.db');
 
       final filtered = withoutPendingDeletes(
         [only],
