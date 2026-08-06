@@ -38,8 +38,10 @@ in
 pkgs.mkShell {
   shellHook = ''
     echo ${sdk}
-    flutter packages get
-    flutter packages run flutter_launcher_icons:main
+    # `flutter packages` was renamed years ago; `flutter pub run` is also
+    # deprecated for package binaries — use the current entrypoints.
+    flutter pub get
+    dart run flutter_launcher_icons
   '';
   buildInputs = with pkgs; [
     sdk
