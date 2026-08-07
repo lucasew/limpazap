@@ -11,30 +11,39 @@ class SemArquivosWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Icon is intentionally huge for low-vision users (see README), but a fixed
+    // 250px glyph overflows short viewports (e.g. landscape phones). Scale the
+    // whole empty-state block down only when the parent cannot fit it.
     return Semantics(
       label: message,
       child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Decorative: announcement comes from the parent [Semantics].
-            ExcludeSemantics(
-              child: Icon(
-                Icons.done_sharp,
-                size: 250,
-                color: Colors.green,
-              ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Decorative: announcement comes from the parent [Semantics].
+                ExcludeSemantics(
+                  child: Icon(
+                    Icons.done_sharp,
+                    size: 250,
+                    color: Colors.green,
+                  ),
+                ),
+                SizedBox(height: 16),
+                ExcludeSemantics(
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 28, color: Colors.green),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            ExcludeSemantics(
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 28, color: Colors.green),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
