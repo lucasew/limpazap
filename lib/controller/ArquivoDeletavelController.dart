@@ -38,23 +38,38 @@ class ArquivoDeletavelController {
   /// 4. Sorting files by creation date (and optionally reversing based on [inverter]).
   ///
   /// Returns a list of [ArquivoDeletavel] ready for display.
+  ///
+  /// A single file that disappears or becomes unreadable between listing and
+  /// [ArquivoDeletavel.load] is reported and skipped so the rest of the list
+  /// still renders (instead of failing the whole [Future.wait]).
   Future<List<ArquivoDeletavel>> getArquivos() async {
     final allFiles = await _service.getBackupFiles();
 
     // Map files to the ArquivoDeletavel model asynchronously.
     // isUltimo is derived from the file *name* only (see isHistoricalBackup).
-    final deletableFilesList = await Future.wait(
-      allFiles.map(
-        (file) => ArquivoDeletavel.load(
-          file,
-          isUltimo: !ArquivoDeletavel.isHistoricalBackup(file),
-        ),
-      ),
+    final loadedOrNull = await Future.wait(
+      allFiles.map((file) async {
+        try {
+          return await ArquivoDeletavel.load(
+            file,
+            isUltimo: !ArquivoDeletavel.isHistoricalBackup(file),
+          );
+        } on FileSystemException catch (e, stackTrace) {
+          ErrorHandler.reportError(
+            e,
+            stackTrace,
+            'ArquivoDeletavelController load ${file.path}',
+          );
+          return null;
+        }
+      }),
     );
 
     // Filter using the isUltimo flag already computed at load time (avoids a
-    // second regex pass that could drift from ArquivoDeletavel.load).
-    final deletableFiles = deletableFilesList
+    // second regex pass that could drift from ArquivoDeletavel.load). Drop
+    // entries that failed to load (null).
+    final deletableFiles = loadedOrNull
+        .whereType<ArquivoDeletavel>()
         .where((file) => exibirUltimo || !file.isUltimo)
         .toList();
 
