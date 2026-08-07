@@ -51,11 +51,25 @@ class ArquivosViewState extends State<ArquivosView> {
   }
 
   void loadArquivos() {
+    final future = ArquivoDeletavelController(
+      inverter: inverter,
+      exibirUltimo: exibirUltimo,
+    ).getArquivos();
+    // Report load failures once when the future completes — not from
+    // FutureBuilder.builder, which re-runs on every parent setState and would
+    // spam ErrorHandler for the same failed snapshot.
+    future.then<void>(
+      (_) {},
+      onError: (Object error, StackTrace stackTrace) {
+        ErrorHandler.reportError(
+          error,
+          stackTrace,
+          'ArquivosView loadArquivos',
+        );
+      },
+    );
     setState(() {
-      arquivosFuture = ArquivoDeletavelController(
-        inverter: inverter,
-        exibirUltimo: exibirUltimo,
-      ).getArquivos();
+      arquivosFuture = future;
     });
   }
 
@@ -148,8 +162,6 @@ class ArquivosViewState extends State<ArquivosView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            ErrorHandler.reportError(snapshot.error, snapshot.stackTrace,
-                'ArquivosView FutureBuilder');
             return const Center(
                 child: Text(
                     'Ocorreu um erro ao carregar os arquivos. Tente novamente mais tarde.'));
