@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:limpazap/controller/ArquivoDeletavelController.dart';
+import 'package:limpazap/model/ArquivoDeletavelModel.dart';
 import 'package:limpazap/services/WhatsAppBackupService.dart';
 import 'package:path/path.dart' as p;
 
@@ -25,6 +26,40 @@ void main() {
     setUp(() => temp.setUp(prefix: 'limpazap_get_arquivos_'));
     tearDown(() => temp.tearDown());
 
+    Future<List<ArquivoDeletavel>> loadArquivos(
+      List<FileSystemEntity> files, {
+      bool inverter = false,
+      bool exibirUltimo = false,
+    }) {
+      return ArquivoDeletavelController(
+        service: _FakeBackupService(files),
+        inverter: inverter,
+        exibirUltimo: exibirUltimo,
+      ).getArquivos();
+    }
+
+    /// Mid / oldest / newest historical backups (shuffled creation order).
+    Future<List<File>> threeHistoricalBackups() async {
+      return [
+        await temp.createFile(
+          'msgstore-2024-01-02.1.db.crypt15',
+          modified: DateTime.utc(2024, 1, 2),
+        ),
+        await temp.createFile(
+          'msgstore-2024-01-01.1.db.crypt15',
+          modified: DateTime.utc(2024, 1, 1),
+        ),
+        await temp.createFile(
+          'msgstore-2024-01-03.1.db.crypt15',
+          modified: DateTime.utc(2024, 1, 3),
+        ),
+      ];
+    }
+
+    List<String> basenames(List<ArquivoDeletavel> files) {
+      return files.map((f) => p.basename(f.arquivo.path)).toList();
+    }
+
     test('hides the active database when exibirUltimo is false', () async {
       final active = await temp.createFile(
         'msgstore.db.crypt15',
@@ -39,20 +74,13 @@ void main() {
         modified: DateTime.utc(2024, 1, 2),
       );
 
-      final controller = ArquivoDeletavelController(
-        service: _FakeBackupService([active, older, newer]),
-      );
-
-      final files = await controller.getArquivos();
+      final files = await loadArquivos([active, older, newer]);
 
       expect(files, hasLength(2));
-      expect(
-        files.map((f) => p.basename(f.arquivo.path)).toList(),
-        [
-          'msgstore-2024-01-01.1.db.crypt15',
-          'msgstore-2024-01-02.1.db.crypt15',
-        ],
-      );
+      expect(basenames(files), [
+        'msgstore-2024-01-01.1.db.crypt15',
+        'msgstore-2024-01-02.1.db.crypt15',
+      ]);
       expect(files.every((f) => !f.isUltimo), isTrue);
     });
 
@@ -66,12 +94,10 @@ void main() {
         modified: DateTime.utc(2024, 1, 1),
       );
 
-      final controller = ArquivoDeletavelController(
-        service: _FakeBackupService([active, backup]),
+      final files = await loadArquivos(
+        [active, backup],
         exibirUltimo: true,
       );
-
-      final files = await controller.getArquivos();
 
       expect(files, hasLength(2));
       expect(
@@ -81,64 +107,26 @@ void main() {
     });
 
     test('sorts oldest first by default', () async {
-      final mid = await temp.createFile(
-        'msgstore-2024-01-02.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 2),
-      );
-      final oldest = await temp.createFile(
+      final files = await loadArquivos(await threeHistoricalBackups());
+
+      expect(basenames(files), [
         'msgstore-2024-01-01.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 1),
-      );
-      final newest = await temp.createFile(
+        'msgstore-2024-01-02.1.db.crypt15',
         'msgstore-2024-01-03.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 3),
-      );
-
-      final controller = ArquivoDeletavelController(
-        service: _FakeBackupService([mid, oldest, newest]),
-      );
-
-      final files = await controller.getArquivos();
-
-      expect(
-        files.map((f) => p.basename(f.arquivo.path)).toList(),
-        [
-          'msgstore-2024-01-01.1.db.crypt15',
-          'msgstore-2024-01-02.1.db.crypt15',
-          'msgstore-2024-01-03.1.db.crypt15',
-        ],
-      );
+      ]);
     });
 
     test('sorts newest first when inverter is true', () async {
-      final mid = await temp.createFile(
-        'msgstore-2024-01-02.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 2),
-      );
-      final oldest = await temp.createFile(
-        'msgstore-2024-01-01.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 1),
-      );
-      final newest = await temp.createFile(
-        'msgstore-2024-01-03.1.db.crypt15',
-        modified: DateTime.utc(2024, 1, 3),
-      );
-
-      final controller = ArquivoDeletavelController(
-        service: _FakeBackupService([mid, oldest, newest]),
+      final files = await loadArquivos(
+        await threeHistoricalBackups(),
         inverter: true,
       );
 
-      final files = await controller.getArquivos();
-
-      expect(
-        files.map((f) => p.basename(f.arquivo.path)).toList(),
-        [
-          'msgstore-2024-01-03.1.db.crypt15',
-          'msgstore-2024-01-02.1.db.crypt15',
-          'msgstore-2024-01-01.1.db.crypt15',
-        ],
-      );
+      expect(basenames(files), [
+        'msgstore-2024-01-03.1.db.crypt15',
+        'msgstore-2024-01-02.1.db.crypt15',
+        'msgstore-2024-01-01.1.db.crypt15',
+      ]);
     });
   });
 }
