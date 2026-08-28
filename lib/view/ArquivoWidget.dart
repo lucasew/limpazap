@@ -72,6 +72,7 @@ class ArquivoWidget extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Icon(arquivo.isUltimo ? Icons.warning : Icons.history, size: 36),
+            const SizedBox(width: 8),
             Text(_textoDataCriacao, style: const TextStyle(fontSize: 36)),
           ],
         ),
@@ -79,12 +80,21 @@ class ArquivoWidget extends StatelessWidget {
     );
   }
 
+  /// Size row uses the same scale-down path as the date title so large-type
+  /// (and accessibility text scale) cannot overflow the list tile height.
   Widget _buildSubtitle() {
-    return Row(
-      children: <Widget>[
-        const Icon(Icons.sd_card, size: 36),
-        Text(_textoTamanho, style: const TextStyle(fontSize: 28)),
-      ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 40),
+      child: FittedBox(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: <Widget>[
+            const Icon(Icons.sd_card, size: 36),
+            const SizedBox(width: 8),
+            Text(_textoTamanho, style: const TextStyle(fontSize: 28)),
+          ],
+        ),
+      ),
     );
   }
 
